@@ -70,6 +70,8 @@
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__background__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organism__ = __webpack_require__(2);
+
 
 
 const backgroundPath = 'https://s3-us-west-1.amazonaws.com/talons-dev/placeholder-background.jpeg';
@@ -89,6 +91,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
   const background = new __WEBPACK_IMPORTED_MODULE_0__background__["a" /* default */](ctx, backgroundPath, canvasWidth);
+  const organism = new __WEBPACK_IMPORTED_MODULE_1__organism__["a" /* default */](50, canvasWidth, canvasHeight, ctx);
   let mousePos;
   background.drawBackground();
 
@@ -103,6 +106,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   setInterval(() => {
     background.drawBackground();
+    organism.drawOrganism();
   }, 42);
 });
 
@@ -147,7 +151,9 @@ class Background {
   dampenStaleCursorInput() {
     if (this.isDampening) {
       this.cursorOffsetX = this.cursorOffsetX * 0.8;
-      if (Math.abs(this.cursorOffsetX) < 1) this.cursorOffsetX = 0;
+      if (Math.abs(this.cursorOffsetX) < 1) {
+        this.cursorOffsetX = 0;
+      }
     }
   }
 
@@ -171,6 +177,35 @@ class Background {
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Background;
+
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Organism {
+  constructor(radius, canvasWidth, canvasHeight, ctx) {
+    this.ctx = ctx;
+    this.radius = radius;
+    this.centerX = Math.floor(Math.random() * (canvasWidth - 2*radius))+radius;
+    this.centerY = Math.floor(Math.random() * (canvasHeight - 2*radius))+radius;
+    this.speed = 10;
+  }
+
+  drawOrganism() {
+    this.ctx.beginPath();
+    this.ctx.arc(this.centerX, this.centerY, this.radius, 0, 2 * Math.PI);
+    this.ctx.fillStyle = 'red';
+    this.ctx.fill();
+  }
+
+  moveOrganism() {
+    
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Organism;
 
 
 

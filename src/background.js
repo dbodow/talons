@@ -33,7 +33,9 @@ export default class Background {
   dampenStaleCursorInput() {
     if (this.isDampening) {
       this.cursorOffsetX = this.cursorOffsetX * 0.8;
-      if (Math.abs(this.cursorOffsetX) < 1) this.cursorOffsetX = 0;
+      if (Math.abs(this.cursorOffsetX) < 1) {
+        this.cursorOffsetX = 0;
+      }
     }
   }
 
