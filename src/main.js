@@ -1,5 +1,4 @@
 import Background from './background';
-import Organism from './organism';
 
 const backgroundPath = 'https://s3-us-west-1.amazonaws.com/talons-dev/placeholder-background.jpeg';
 
@@ -17,8 +16,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
   const ctx = canvas.getContext("2d");
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
-  const background = new Background(ctx, backgroundPath, canvasWidth);
-  const organism = new Organism(50, canvasWidth, canvasHeight, ctx);
+  const backgroundParams = {
+    ctx,
+    canvasWidth,
+    canvasHeight,
+    backgroundPath,
+  };
+  const background = new Background(backgroundParams);
+
   let mousePos;
   background.drawBackground();
 
@@ -33,6 +38,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   setInterval(() => {
     background.drawBackground();
-    organism.drawOrganism();
+    background.drawOrganisms();
   }, 42);
 });
