@@ -1,15 +1,25 @@
+import { positiveMod } from '../util/util';
+
 export default class Organism {
-  constructor(radius, imageWidth, imageHeight, ctx) {
+  constructor({speed, radius, color}, ctx, panoramaWidth, panoramaHeight) {
     this.ctx = ctx;
+    this.speed = speed;
     this.radius = radius;
-    this.imageWidth = imageWidth;
-    this.imageHeight = imageHeight;
-    // this.centerX = Math.floor(Math.random() * (imageWidth - 2*radius))+radius;
-    // this.centerY = Math.floor(Math.random() * (imageHeight - 2*radius))+radius;
-    this.centerX = 500;
-    this.centerY = 500;
-    this.speed = 20;
-    // sample as an angle for a uniform distribution of angles
+    this.color = color;
+    this.panoramaWidth = panoramaWidth;
+    this.panoramaHeight = panoramaHeight;
+    this.initializeCenter();
+    this.initializeDirection();
+    console.log('created', this.centerX);
+  }
+
+  initializeCenter() {
+    this.centerX = Math.random() * this.panoramaWidth;
+    this.centerY = Math.random() * (this.panoramaHeight - 2 * this.radius) + this.radius;
+  }
+
+  initializeDirection() {
+    // sample as an angle for a uniform radial distribution
     // i.e. don't bias directions to the diagonals via a cartesian ransom sample
     const radialDirection = Math.random() * 2 * Math.PI;
     this.direction = {
@@ -18,26 +28,23 @@ export default class Organism {
     };
   }
 
-  drawOrganism() {
+  draw(dx) {
     this.moveOrganism();
+    this.renderOrganism(dx);
+  }
+
+  renderOrganism(dx) {
+    // console.log('rendering organism');
     this.ctx.beginPath();
-    this.ctx.arc(this.centerX, this.centerY, this.radius, 0, 2 * Math.PI);
-    this.ctx.fillStyle = 'red';
+    this.ctx.arc(positiveMod(this.centerX - dx, this.panoramaWidth), this.centerY, this.radius, 0, 2 * Math.PI);
+    this.ctx.fillStyle = this.color;
     this.ctx.fill();
   }
 
   moveOrganism() {
-    this.centerX += this.xMovement();
+    this.centerX = positiveMod(this.centerX + this.xMovement(), this.panoramaWidth);
     this.centerY += this.yMovement();
-    if (this.centerY > this.maxHeight()) {
-      const overflow = this.centerY - this.maxHeight();
-      this.centerY -= overflow;
-      this.direction.y = -1 * this.direction.y;
-    } else if (this.centerY < this.minHeight()) {
-      const underflow = this.minHeight() - this.centerY;
-      this.centerY += underflow;
-      this.direction.y = -1 * this.direction.y;
-    }
+    this.resolveBounces();
   }
 
   yMovement() {
@@ -53,10 +60,18 @@ export default class Organism {
   }
 
   maxHeight() {
-    return this.imageHeight - this.radius;
+    return this.panoramaHeight - this.radius;
   }
 
-  positiveMod(n, m) {
-    return ((n % m) + m) % m;
+  resolveBounces() {
+    if (this.centerY > this.maxHeight()) {
+      const overflow = this.centerY - this.maxHeight();
+      this.centerY -= overflow;
+      this.direction.y = -1 * this.direction.y;
+    } else if (this.centerY < this.minHeight()) {
+      const underflow = this.minHeight() - this.centerY;
+      this.centerY += underflow;
+      this.direction.y = -1 * this.direction.y;
+    }
   }
 }
