@@ -26,6 +26,8 @@ export default class PredatorsController extends OrganismsController {
   updateDirections() {
     this.organisms.forEach( organism => {
       organism.constructGradient(this.predatorsField, this.gravitationNbhd, this.fieldNetSize);
+      organism.flipGradient();
+      organism.updateDirection();
     });
   }
 }

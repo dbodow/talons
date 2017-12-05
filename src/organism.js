@@ -110,9 +110,8 @@ export default class Organism {
   updateDirection() {
     const totalSpeed = Math.sqrt( Math.pow(this.direction.x + this.gradient.x, 2) +
                                   Math.pow(this.direction.y + this.gradient.y, 2));
-    const dampening = 1 / totalSpeed;
-    this.direction.x = (this.direction.x + this.gradient.x) * dampening;
-    this.direction.y = (this.direction.y + this.gradient.y) * dampening;
-    // console.log(this.direction);
+    const normalization = 1 / totalSpeed;
+    this.direction.x = (this.direction.x + this.gradient.x) * normalization;
+    this.direction.y = (this.direction.y + this.gradient.y) * normalization;
   }
 }

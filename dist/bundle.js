@@ -414,10 +414,9 @@ class Organism {
   updateDirection() {
     const totalSpeed = Math.sqrt( Math.pow(this.direction.x + this.gradient.x, 2) +
                                   Math.pow(this.direction.y + this.gradient.y, 2));
-    const dampening = 1 / totalSpeed;
-    this.direction.x = (this.direction.x + this.gradient.x) * dampening;
-    this.direction.y = (this.direction.y + this.gradient.y) * dampening;
-    // console.log(this.direction);
+    const normalization = 1 / totalSpeed;
+    this.direction.x = (this.direction.x + this.gradient.x) * normalization;
+    this.direction.y = (this.direction.y + this.gradient.y) * normalization;
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Organism;
@@ -459,6 +458,8 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
   updateDirections() {
     this.organisms.forEach( organism => {
       organism.constructGradient(this.predatorsField, this.gravitationNbhd, this.fieldNetSize);
+      organism.flipGradient();
+      organism.updateDirection();
     });
   }
 }
@@ -475,12 +476,12 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
 class Controls {
   constructor(backgroundImage) {
     //set defaults
-    this.predatorCount = 25;
-    this.predatorSpeed = 20;
+    this.predatorCount = 100;
+    this.predatorSpeed = 5;
     this.predatorRadius = 40;
     this.predatorColor = '#bc482b';
-    this.preyCount = 10;
-    this.preySpeed = 10;
+    this.preyCount = 100;
+    this.preySpeed = 3;
     this.preyRadius = 20;
     this.preyColor = '#4c6ea5';
     this.backgroundImage = backgroundImage;
@@ -531,6 +532,12 @@ class Controls {
 class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
   constructor(preyParams, ctx, panoramaWidth, panoramaHeight) {
     super(preyParams, ctx, panoramaWidth, panoramaHeight);
+  }
+
+  flipGradient() {
+    // run from the predators, not to them
+    this.gradient.x = -1 * this.gradient.x;
+    this.gradient.y = -1 * this.gradient.y;
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Prey;

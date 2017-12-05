@@ -2,12 +2,12 @@
 export default class Controls {
   constructor(backgroundImage) {
     //set defaults
-    this.predatorCount = 25;
-    this.predatorSpeed = 20;
+    this.predatorCount = 100;
+    this.predatorSpeed = 5;
     this.predatorRadius = 40;
     this.predatorColor = '#bc482b';
-    this.preyCount = 10;
-    this.preySpeed = 10;
+    this.preyCount = 100;
+    this.preySpeed = 3;
     this.preyRadius = 20;
     this.preyColor = '#4c6ea5';
     this.backgroundImage = backgroundImage;
