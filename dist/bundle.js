@@ -145,7 +145,7 @@ class Panorama {
     this.canvasWidth = backgroundParams.canvas.width;
     this.canvasHeight = backgroundParams.canvas.height;
     this.predatorsController = new __WEBPACK_IMPORTED_MODULE_1__predators_controller__["a" /* default */](userParams.predatorsParams(), this.ctx, this.panoramaWidth, this.panoramaHeight);
-    // this.preyController = new PreyController(userParams.preyParams, this.ctx);
+    this.preyController = new __WEBPACK_IMPORTED_MODULE_2__prey_controller__["a" /* default */](userParams.preysParams(), this.ctx, this.panoramaWidth, this.panoramaHeight);
 
     // defaults
     this.dx = 0;
@@ -158,7 +158,7 @@ class Panorama {
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.background.draw(this.dx);
     this.predatorsController.draw(this.dx);
-    // this.preyController.draw();
+    this.preyController.draw(this.dx);
   }
 
   updateDx() {
@@ -237,26 +237,26 @@ class Background {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__predator__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(10);
 
 
-class PredatorsController {
-  constructor({count, predatorParams}, ctx, panoramaWidth, panoramaHeight) {
-    this.ctx = ctx;
-    this.predators = [];
+
+class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller__["a" /* default */] {
+  constructor(predatorsParams, ctx, panoramaWidth, panoramaHeight) {
+    super(ctx, panoramaWidth, panoramaHeight);
+    this.predatorParams = predatorsParams.predatorParams;
+    this.populatePredators(predatorsParams.count);
+  }
+
+  populatePredators(count) {
     for (let i = 0; i < count; i++) {
-      this.createPredator(predatorParams, ctx, panoramaWidth, panoramaHeight);
+      this.createPredator();
     }
   }
 
-  createPredator(predatorParams, ctx, panoramaWidth, panoramaHeight) {
-    const predator = new __WEBPACK_IMPORTED_MODULE_0__predator__["a" /* default */](predatorParams, ctx, panoramaWidth, panoramaHeight);
-    this.predators.push(predator);
-  }
-
-  draw(dx) {
-    this.predators.forEach( predator => {
-      predator.draw(dx);
-    });
+  createPredator(predatorParams) {
+    const predator = new __WEBPACK_IMPORTED_MODULE_0__predator__["a" /* default */](this.predatorParams, this.ctx, this.panoramaWidth, this.panoramaHeight);
+    this.organisms.push(predator);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PredatorsController;
@@ -298,7 +298,6 @@ class Organism {
     this.panoramaHeight = panoramaHeight;
     this.initializeCenter();
     this.initializeDirection();
-    console.log('created', this.centerX);
   }
 
   initializeCenter() {
@@ -373,19 +372,29 @@ class Organism {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__prey__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(10);
 
 
-class PredatorsController {
-  constructor() {
-    this.preyList = [];
+
+class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller__["a" /* default */] {
+  constructor(preysParams, ctx, panoramaWidth, panoramaHeight) {
+    super(ctx, panoramaWidth, panoramaHeight);
+    this.preyParams = preysParams.preyParams;
+    this.populatePreys(preysParams.count);
+  }
+
+  populatePreys(count) {
+    for (let i = 0; i < count; i++) {
+      this.createPrey();
+    }
   }
 
   createPrey(preyParams) {
-    const prey = new __WEBPACK_IMPORTED_MODULE_0__prey__["a" /* default */](preyParams);
-    this.preyList.push(prey);
+    const prey = new __WEBPACK_IMPORTED_MODULE_0__prey__["a" /* default */](this.preyParams, this.ctx, this.panoramaWidth, this.panoramaHeight);
+    this.organisms.push(prey);
   }
 }
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = PredatorsController;
 
 
 
@@ -402,7 +411,7 @@ class Controls {
     this.predatorSpeed = 20;
     this.predatorRadius = 40;
     this.predatorColor = 'red';
-    this.preyCount = 5;
+    this.preyCount = 200;
     this.preySpeed = 10;
     this.preyRadius = 20;
     this.preyColor = 'blue';
@@ -420,12 +429,14 @@ class Controls {
     };
   }
 
-  preyParams() {
+  preysParams() {
     return {
-      preyCount: this.preyCount,
-      preySpeed: this.preySpeed,
-      preyRadius: this.preyRadius,
-      preyColor: this.preyColor
+      count: this.preyCount,
+      preyParams: {
+        speed: this.preySpeed,
+        radius: this.preyRadius,
+        color: this.preyColor
+      }
     };
   }
 
@@ -446,8 +457,9 @@ class Controls {
 
 
 class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
-  constructor(preyParams) {
-    super(preyParams);
+  constructor(preyParams, ctx, panoramaWidth, panoramaHeight) {
+    // console.log("prey ", preyParams, ctx, panoramaWidth, panoramaHeight);
+    super(preyParams, ctx, panoramaWidth, panoramaHeight);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Prey;
@@ -463,6 +475,29 @@ const positiveMod = (n, m) => (
   ((n % m) + m) % m
 );
 /* harmony export (immutable) */ __webpack_exports__["a"] = positiveMod;
+
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class OrganismsController {
+  constructor(ctx, panoramaWidth, panoramaHeight) {
+    this.ctx = ctx;
+    this.panoramaWidth = panoramaWidth;
+    this.panoramaHeight = panoramaHeight;
+    this.organisms = [];
+  }
+
+  draw(dx) {
+    this.organisms.forEach( organism => {
+      organism.draw(dx);
+    });
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = OrganismsController;
 
 
 

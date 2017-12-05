@@ -6,7 +6,7 @@ export default class Controls {
     this.predatorSpeed = 20;
     this.predatorRadius = 40;
     this.predatorColor = 'red';
-    this.preyCount = 5;
+    this.preyCount = 200;
     this.preySpeed = 10;
     this.preyRadius = 20;
     this.preyColor = 'blue';
@@ -24,12 +24,14 @@ export default class Controls {
     };
   }
 
-  preyParams() {
+  preysParams() {
     return {
-      preyCount: this.preyCount,
-      preySpeed: this.preySpeed,
-      preyRadius: this.preyRadius,
-      preyColor: this.preyColor
+      count: this.preyCount,
+      preyParams: {
+        speed: this.preySpeed,
+        radius: this.preyRadius,
+        color: this.preyColor
+      }
     };
   }
 

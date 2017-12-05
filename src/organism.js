@@ -10,7 +10,6 @@ export default class Organism {
     this.panoramaHeight = panoramaHeight;
     this.initializeCenter();
     this.initializeDirection();
-    console.log('created', this.centerX);
   }
 
   initializeCenter() {

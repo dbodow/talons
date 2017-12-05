@@ -1,22 +1,21 @@
 import Predator from './predator';
+import OrganismsController from './organisms_controller';
 
-export default class PredatorsController {
-  constructor({count, predatorParams}, ctx, panoramaWidth, panoramaHeight) {
-    this.ctx = ctx;
-    this.predators = [];
+export default class PredatorsController extends OrganismsController {
+  constructor(predatorsParams, ctx, panoramaWidth, panoramaHeight) {
+    super(ctx, panoramaWidth, panoramaHeight);
+    this.predatorParams = predatorsParams.predatorParams;
+    this.populatePredators(predatorsParams.count);
+  }
+
+  populatePredators(count) {
     for (let i = 0; i < count; i++) {
-      this.createPredator(predatorParams, ctx, panoramaWidth, panoramaHeight);
+      this.createPredator();
     }
   }
 
-  createPredator(predatorParams, ctx, panoramaWidth, panoramaHeight) {
-    const predator = new Predator(predatorParams, ctx, panoramaWidth, panoramaHeight);
-    this.predators.push(predator);
-  }
-
-  draw(dx) {
-    this.predators.forEach( predator => {
-      predator.draw(dx);
-    });
+  createPredator(predatorParams) {
+    const predator = new Predator(this.predatorParams, this.ctx, this.panoramaWidth, this.panoramaHeight);
+    this.organisms.push(predator);
   }
 }
