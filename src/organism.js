@@ -1,4 +1,5 @@
-import { positiveMod } from '../util/util';
+import { positiveMod, fieldCellCoords, gravitation,
+         distance, distanceX, distanceY } from '../util/util';
 
 export default class Organism {
   constructor({speed, radius, color}, ctx, panoramaWidth, panoramaHeight) {
@@ -72,5 +73,46 @@ export default class Organism {
       this.centerY += underflow;
       this.direction.y = -1 * this.direction.y;
     }
+  }
+
+  // calculate the current position in the discrete field
+  updateFieldPosition(fieldNetSize) {
+    // debugger;
+    this.fieldPosition = fieldCellCoords(this.centerX, this.centerY, fieldNetSize);
+  }
+
+  // use the field of other organisms to construct a gradient
+  constructGradient(field, gravitationNbhd, fieldNetSize) {
+    this.gradient = {
+      x: 0,
+      y: 0
+    };
+    for (let row = this.fieldPosition.y - gravitationNbhd; row < this.fieldPosition.y + gravitationNbhd; row++) {
+      for (let col = this.fieldPosition.x - gravitationNbhd; col < this.fieldPosition.x + gravitationNbhd; col++) {
+        let proxyCol = col;
+        if (row < 0 || row >= this.panoramaHeight / fieldNetSize) continue;
+        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / fieldNetSize) proxyCol = positiveMod(proxyCol, Math.floor(this.panoramaWidth / fieldNetSize));
+        if (col === this.fieldPosition.x || row === this.fieldPosition.y) continue;
+        const dist = distance(col, row, this.fieldPosition.x, this.fieldPosition.y, this.panoramaWidth);
+        const weight = gravitation(dist);
+        const xDist = distanceX(this.fieldPosition.x, col, this.panoramaWidth);
+        const yDist = distanceY(this.fieldPosition.y, row);
+        const sin = yDist / dist;
+        const cos = xDist / dist;
+        const sgnX = (col > this.fieldPosition.x) ? 1 : -1 ;
+        const sgnY = (row > this.fieldPosition.y) ? 1 : -1 ;
+        this.gradient.x += field[row][proxyCol] * cos * weight * sgnX;
+        this.gradient.y += field[row][proxyCol] * sin * weight * sgnY;
+      }
+    }
+  }
+
+  updateDirection() {
+    const totalSpeed = Math.sqrt( Math.pow(this.direction.x + this.gradient.x, 2) +
+                                  Math.pow(this.direction.y + this.gradient.y, 2));
+    const dampening = 1 / totalSpeed;
+    this.direction.x = (this.direction.x + this.gradient.x) * dampening;
+    this.direction.y = (this.direction.y + this.gradient.y) * dampening;
+    // console.log(this.direction);
   }
 }

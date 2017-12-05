@@ -146,7 +146,8 @@ class Panorama {
     this.canvasHeight = backgroundParams.canvas.height;
     this.predatorsController = new __WEBPACK_IMPORTED_MODULE_1__predators_controller__["a" /* default */](userParams.predatorsParams(), this.ctx, this.panoramaWidth, this.panoramaHeight);
     this.preyController = new __WEBPACK_IMPORTED_MODULE_2__prey_controller__["a" /* default */](userParams.preysParams(), this.ctx, this.panoramaWidth, this.panoramaHeight);
-
+    this.predatorsController.receivePreysField(this.preyController.gravitationalField);
+    this.preyController.receivePredatorsField(this.predatorsController.gravitationalField);
     // defaults
     this.dx = 0;
     this.isDampening = false;
@@ -157,14 +158,18 @@ class Panorama {
     // console.log('new draw');
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.background.draw(this.dx);
-    this.predatorsController.draw(this.dx);
+    this.preyController.calculateField();
+    this.predatorsController.calculateField();
+    this.preyController.updateDirections();
     this.preyController.draw(this.dx);
+    this.predatorsController.draw(this.dx);
+    this.predatorsController.updateDirections();
   }
 
   updateDx() {
     this.dampenStaleCursorInput();
     this.dx += this.cursorOffsetX * 0.075;
-    this.dx = Object(__WEBPACK_IMPORTED_MODULE_3__util_util__["a" /* positiveMod */])(this.dx, this.panoramaWidth);
+    this.dx = Object(__WEBPACK_IMPORTED_MODULE_3__util_util__["f" /* positiveMod */])(this.dx, this.panoramaWidth);
   }
 
   toggleDampening(bool) {
@@ -243,7 +248,7 @@ class Background {
 
 class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller__["a" /* default */] {
   constructor(predatorsParams, ctx, panoramaWidth, panoramaHeight) {
-    super(ctx, panoramaWidth, panoramaHeight);
+    super(ctx, panoramaWidth, panoramaHeight, predatorsParams);
     this.predatorParams = predatorsParams.predatorParams;
     this.populatePredators(predatorsParams.count);
   }
@@ -254,10 +259,22 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
     }
   }
 
+  receivePreysField(field) {
+    this.preysField = field;
+  }
+
   createPredator(predatorParams) {
     const predator = new __WEBPACK_IMPORTED_MODULE_0__predator__["a" /* default */](this.predatorParams, this.ctx, this.panoramaWidth, this.panoramaHeight);
     this.organisms.push(predator);
   }
+
+  updateDirections() {
+    this.organisms.forEach( organism => {
+      organism.constructGradient(this.preysField, this.gravitationNbhd, this.fieldNetSize);
+      organism.updateDirection();
+    });
+  }
+
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PredatorsController;
 
@@ -323,13 +340,13 @@ class Organism {
   renderOrganism(dx) {
     // console.log('rendering organism');
     this.ctx.beginPath();
-    this.ctx.arc(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* positiveMod */])(this.centerX - dx, this.panoramaWidth), this.centerY, this.radius, 0, 2 * Math.PI);
+    this.ctx.arc(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* positiveMod */])(this.centerX - dx, this.panoramaWidth), this.centerY, this.radius, 0, 2 * Math.PI);
     this.ctx.fillStyle = this.color;
     this.ctx.fill();
   }
 
   moveOrganism() {
-    this.centerX = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* positiveMod */])(this.centerX + this.xMovement(), this.panoramaWidth);
+    this.centerX = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* positiveMod */])(this.centerX + this.xMovement(), this.panoramaWidth);
     this.centerY += this.yMovement();
     this.resolveBounces();
   }
@@ -361,6 +378,47 @@ class Organism {
       this.direction.y = -1 * this.direction.y;
     }
   }
+
+  // calculate the current position in the discrete field
+  updateFieldPosition(fieldNetSize) {
+    // debugger;
+    this.fieldPosition = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["d" /* fieldCellCoords */])(this.centerX, this.centerY, fieldNetSize);
+  }
+
+  // use the field of other organisms to construct a gradient
+  constructGradient(field, gravitationNbhd, fieldNetSize) {
+    this.gradient = {
+      x: 0,
+      y: 0
+    };
+    for (let row = this.fieldPosition.y - gravitationNbhd; row < this.fieldPosition.y + gravitationNbhd; row++) {
+      for (let col = this.fieldPosition.x - gravitationNbhd; col < this.fieldPosition.x + gravitationNbhd; col++) {
+        let proxyCol = col;
+        if (row < 0 || row >= this.panoramaHeight / fieldNetSize) continue;
+        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / fieldNetSize) proxyCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* positiveMod */])(proxyCol, Math.floor(this.panoramaWidth / fieldNetSize));
+        if (col === this.fieldPosition.x || row === this.fieldPosition.y) continue;
+        const dist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* distance */])(col, row, this.fieldPosition.x, this.fieldPosition.y, this.panoramaWidth);
+        const weight = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["e" /* gravitation */])(dist);
+        const xDist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["b" /* distanceX */])(this.fieldPosition.x, col, this.panoramaWidth);
+        const yDist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["c" /* distanceY */])(this.fieldPosition.y, row);
+        const sin = yDist / dist;
+        const cos = xDist / dist;
+        const sgnX = (col > this.fieldPosition.x) ? 1 : -1 ;
+        const sgnY = (row > this.fieldPosition.y) ? 1 : -1 ;
+        this.gradient.x += field[row][proxyCol] * cos * weight * sgnX;
+        this.gradient.y += field[row][proxyCol] * sin * weight * sgnY;
+      }
+    }
+  }
+
+  updateDirection() {
+    const totalSpeed = Math.sqrt( Math.pow(this.direction.x + this.gradient.x, 2) +
+                                  Math.pow(this.direction.y + this.gradient.y, 2));
+    const dampening = 1 / totalSpeed;
+    this.direction.x = (this.direction.x + this.gradient.x) * dampening;
+    this.direction.y = (this.direction.y + this.gradient.y) * dampening;
+    // console.log(this.direction);
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Organism;
 
@@ -378,7 +436,7 @@ class Organism {
 
 class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller__["a" /* default */] {
   constructor(preysParams, ctx, panoramaWidth, panoramaHeight) {
-    super(ctx, panoramaWidth, panoramaHeight);
+    super(ctx, panoramaWidth, panoramaHeight, preysParams);
     this.preyParams = preysParams.preyParams;
     this.populatePreys(preysParams.count);
   }
@@ -389,9 +447,19 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
     }
   }
 
+  receivePredatorsField(field) {
+    this.predatorsField = field;
+  }
+
   createPrey(preyParams) {
     const prey = new __WEBPACK_IMPORTED_MODULE_0__prey__["a" /* default */](this.preyParams, this.ctx, this.panoramaWidth, this.panoramaHeight);
     this.organisms.push(prey);
+  }
+
+  updateDirections() {
+    this.organisms.forEach( organism => {
+      organism.constructGradient(this.predatorsField, this.gravitationNbhd, this.fieldNetSize);
+    });
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PredatorsController;
@@ -407,19 +475,21 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
 class Controls {
   constructor(backgroundImage) {
     //set defaults
-    this.predatorCount = 10;
+    this.predatorCount = 25;
     this.predatorSpeed = 20;
     this.predatorRadius = 40;
-    this.predatorColor = 'red';
-    this.preyCount = 200;
+    this.predatorColor = '#bc482b';
+    this.preyCount = 10;
     this.preySpeed = 10;
     this.preyRadius = 20;
-    this.preyColor = 'blue';
+    this.preyColor = '#4c6ea5';
     this.backgroundImage = backgroundImage;
   }
 
   predatorsParams() {
     return {
+      fieldNetSize: 50,
+      gravitationNbhd: 3,
       count: this.predatorCount,
       predatorParams: {
         speed: this.predatorSpeed,
@@ -431,6 +501,8 @@ class Controls {
 
   preysParams() {
     return {
+      fieldNetSize: 50, // todo: optimize based on pred/prey ratio
+      gravitationNbhd: 3,
       count: this.preyCount,
       preyParams: {
         speed: this.preySpeed,
@@ -458,7 +530,6 @@ class Controls {
 
 class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
   constructor(preyParams, ctx, panoramaWidth, panoramaHeight) {
-    // console.log("prey ", preyParams, ctx, panoramaWidth, panoramaHeight);
     super(preyParams, ctx, panoramaWidth, panoramaHeight);
   }
 }
@@ -474,7 +545,50 @@ class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
 const positiveMod = (n, m) => (
   ((n % m) + m) % m
 );
-/* harmony export (immutable) */ __webpack_exports__["a"] = positiveMod;
+/* harmony export (immutable) */ __webpack_exports__["f"] = positiveMod;
+
+
+// computed the horizontal distance between two points
+// accounting for the panorama's wrapping
+const distanceX = (x1, x2, panoramaWidth) => {
+  const smaller = Math.min(x1, x2);
+  const larger = Math.max(x1, x2);
+  const innerDistance = larger - smaller;
+  const outerDistance = smaller + panoramaWidth - smaller;
+  return Math.min(innerDistance, outerDistance);
+};
+/* harmony export (immutable) */ __webpack_exports__["b"] = distanceX;
+
+
+const distanceY = (y1, y2) => {
+  return Math.abs(y2 - y1);
+};
+/* harmony export (immutable) */ __webpack_exports__["c"] = distanceY;
+
+
+const distance = (x1, y1, x2, y2, panoramaWidth) => {
+  return Math.sqrt(Math.pow(distanceY(y1, y2), 2) +
+                   Math.pow(distanceX(x1, x2, panoramaWidth), 2));
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = distance;
+
+
+const fieldCellCoords = (x, y, fieldNetSize) => ({
+  x: Math.floor(x / fieldNetSize),
+  y: Math.floor(y / fieldNetSize)
+});
+/* harmony export (immutable) */ __webpack_exports__["d"] = fieldCellCoords;
+
+
+const gravitation = dist => {
+  if (dist === 0) {
+    // avoid singularities;
+    return 4;
+  } else {
+    return Math.pow(dist, -2);
+  }
+};
+/* harmony export (immutable) */ __webpack_exports__["e"] = gravitation;
 
 
 
@@ -483,18 +597,68 @@ const positiveMod = (n, m) => (
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_util__ = __webpack_require__(9);
+
+
 class OrganismsController {
-  constructor(ctx, panoramaWidth, panoramaHeight) {
+  constructor(ctx, panoramaWidth, panoramaHeight, {fieldNetSize, gravitationNbhd}) {
     this.ctx = ctx;
     this.panoramaWidth = panoramaWidth;
     this.panoramaHeight = panoramaHeight;
     this.organisms = [];
+    this.fieldNetSize = fieldNetSize;
+    this.gravitationNbhd = gravitationNbhd;
+    this.initializeField();
   }
+
+
 
   draw(dx) {
     this.organisms.forEach( organism => {
       organism.draw(dx);
     });
+  }
+
+  initializeField() {
+    const rowCount = Math.ceil(this.panoramaHeight / this.fieldNetSize);
+    const colCount = Math.ceil(this.panoramaWidth / this.fieldNetSize);
+    this.gravitationalField = Array(rowCount).fill(0).map(el => (
+      Array(colCount).fill(0)
+    ));
+  }
+
+  resetField() {
+    // needs to be in the same object
+    const rows = Object.keys(this.gravitationalField);
+    rows.forEach( row => {
+      const cols = Object.keys(row);
+      cols.forEach( col => {
+        this.gravitationalField[row][col] = 0;
+      });
+    });
+  }
+
+  calculateField() {
+    this.resetField();
+    this.organisms.forEach( organism => {
+      this.updateField(organism);
+    });
+    // console.log(this.gravitationalField);
+  }
+
+  updateField(organism) {
+    organism.updateFieldPosition(this.fieldNetSize);
+    const position = organism.fieldPosition;
+    for(let row = position.y - this.gravitationNbhd; row < position.y + this.gravitationNbhd; row++) {
+      for(let col = position.x - this.gravitationNbhd; col < position.x + this.gravitationNbhd; col++) {
+        // JS will get mad if you try to change the iterator mid loop.
+        let proxyCol = col;
+        if (row < 0 || row >= this.panoramaHeight / this.fieldNetSize) continue;
+        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / this.fieldNetSize) proxyCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* positiveMod */])(proxyCol, Math.floor(this.panoramaWidth / this.fieldNetSize));
+        const pointVector = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["e" /* gravitation */])(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* distance */])(position.x, position.y, proxyCol, row, this.panoramaWidth));
+        this.gravitationalField[row][proxyCol] += pointVector;
+      }
+    }
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = OrganismsController;

@@ -3,7 +3,7 @@ import OrganismsController from './organisms_controller';
 
 export default class PredatorsController extends OrganismsController {
   constructor(preysParams, ctx, panoramaWidth, panoramaHeight) {
-    super(ctx, panoramaWidth, panoramaHeight);
+    super(ctx, panoramaWidth, panoramaHeight, preysParams);
     this.preyParams = preysParams.preyParams;
     this.populatePreys(preysParams.count);
   }
@@ -14,8 +14,18 @@ export default class PredatorsController extends OrganismsController {
     }
   }
 
+  receivePredatorsField(field) {
+    this.predatorsField = field;
+  }
+
   createPrey(preyParams) {
     const prey = new Prey(this.preyParams, this.ctx, this.panoramaWidth, this.panoramaHeight);
     this.organisms.push(prey);
+  }
+
+  updateDirections() {
+    this.organisms.forEach( organism => {
+      organism.constructGradient(this.predatorsField, this.gravitationNbhd, this.fieldNetSize);
+    });
   }
 }
