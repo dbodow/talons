@@ -2,12 +2,12 @@
 export default class Controls {
   constructor(backgroundImage) {
     //set defaults
-    this.predatorCount = 100;
-    this.predatorSpeed = 5;
+    this.predatorCount = 10;
+    this.predatorSpeed = 20;
     this.predatorRadius = 40;
     this.predatorColor = '#bc482b';
     this.preyCount = 100;
-    this.preySpeed = 3;
+    this.preySpeed = 10;
     this.preyRadius = 20;
     this.preyColor = '#4c6ea5';
     this.backgroundImage = backgroundImage;
@@ -15,8 +15,8 @@ export default class Controls {
 
   predatorsParams() {
     return {
-      fieldNetSize: 50,
-      gravitationNbhd: 3,
+      fieldNetSize: 10, // Must be smaller than radius/sqrt(2)!
+      gravitationNbhd: 10,
       count: this.predatorCount,
       predatorParams: {
         speed: this.predatorSpeed,
@@ -28,8 +28,8 @@ export default class Controls {
 
   preysParams() {
     return {
-      fieldNetSize: 50, // todo: optimize based on pred/prey ratio
-      gravitationNbhd: 3,
+      fieldNetSize: 10, // Must be smaller than radius/sqrt(2)!
+      gravitationNbhd: 20,
       count: this.preyCount,
       preyParams: {
         speed: this.preySpeed,

@@ -251,6 +251,7 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
     super(ctx, panoramaWidth, panoramaHeight, predatorsParams);
     this.predatorParams = predatorsParams.predatorParams;
     this.populatePredators(predatorsParams.count);
+    this.fieldEdgeSgn = 1;
   }
 
   populatePredators(count) {
@@ -412,11 +413,11 @@ class Organism {
   }
 
   updateDirection() {
-    const totalSpeed = Math.sqrt( Math.pow(this.direction.x + this.gradient.x, 2) +
-                                  Math.pow(this.direction.y + this.gradient.y, 2));
+    const totalSpeed = Math.sqrt( Math.pow(this.direction.x + (this.gradient.x / 10), 2) +
+                                  Math.pow(this.direction.y + (this.gradient.y / 10), 2));
     const normalization = 1 / totalSpeed;
-    this.direction.x = (this.direction.x + this.gradient.x) * normalization;
-    this.direction.y = (this.direction.y + this.gradient.y) * normalization;
+    this.direction.x = (this.direction.x + (this.gradient.x / 10)) * normalization;
+    this.direction.y = (this.direction.y + (this.gradient.y / 10)) * normalization;
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Organism;
@@ -438,6 +439,7 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
     super(ctx, panoramaWidth, panoramaHeight, preysParams);
     this.preyParams = preysParams.preyParams;
     this.populatePreys(preysParams.count);
+    this.fieldEdgeSgn = -1;
   }
 
   populatePreys(count) {
@@ -476,12 +478,12 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
 class Controls {
   constructor(backgroundImage) {
     //set defaults
-    this.predatorCount = 100;
-    this.predatorSpeed = 5;
+    this.predatorCount = 10;
+    this.predatorSpeed = 20;
     this.predatorRadius = 40;
     this.predatorColor = '#bc482b';
     this.preyCount = 100;
-    this.preySpeed = 3;
+    this.preySpeed = 10;
     this.preyRadius = 20;
     this.preyColor = '#4c6ea5';
     this.backgroundImage = backgroundImage;
@@ -489,8 +491,8 @@ class Controls {
 
   predatorsParams() {
     return {
-      fieldNetSize: 50,
-      gravitationNbhd: 3,
+      fieldNetSize: 10, // Must be smaller than radius/sqrt(2)!
+      gravitationNbhd: 10,
       count: this.predatorCount,
       predatorParams: {
         speed: this.predatorSpeed,
@@ -502,8 +504,8 @@ class Controls {
 
   preysParams() {
     return {
-      fieldNetSize: 50, // todo: optimize based on pred/prey ratio
-      gravitationNbhd: 3,
+      fieldNetSize: 10, // Must be smaller than radius/sqrt(2)!
+      gravitationNbhd: 20,
       count: this.preyCount,
       preyParams: {
         speed: this.preySpeed,
@@ -590,7 +592,7 @@ const fieldCellCoords = (x, y, fieldNetSize) => ({
 const gravitation = dist => {
   if (dist === 0) {
     // avoid singularities;
-    return 4;
+    return 100;
   } else {
     return Math.pow(dist, -2);
   }
@@ -637,12 +639,17 @@ class OrganismsController {
   resetField() {
     // needs to be in the same object
     const rows = Object.keys(this.gravitationalField);
+    const centerRow = rows[Math.floor(rows.length/2)];
+    // console.log(centerRow);
     rows.forEach( row => {
-      const cols = Object.keys(row);
+      const cols = Object.keys(this.gravitationalField[row]);
+      const dRowCenter = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["c" /* distanceY */])(centerRow, row);
       cols.forEach( col => {
-        this.gravitationalField[row][col] = 0;
+        // prevent clustering on edges
+        this.gravitationalField[row][col] = this.fieldEdgeSgn*(dRowCenter / centerRow)/1000;
       });
     });
+    // debugger;
   }
 
   calculateField() {
@@ -650,7 +657,6 @@ class OrganismsController {
     this.organisms.forEach( organism => {
       this.updateField(organism);
     });
-    // console.log(this.gravitationalField);
   }
 
   updateField(organism) {

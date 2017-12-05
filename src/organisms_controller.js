@@ -1,4 +1,4 @@
-import { distance, positiveMod, gravitation } from '../util/util';
+import { distance, distanceY, positiveMod, gravitation } from '../util/util';
 
 export default class OrganismsController {
   constructor(ctx, panoramaWidth, panoramaHeight, {fieldNetSize, gravitationNbhd}) {
@@ -30,12 +30,17 @@ export default class OrganismsController {
   resetField() {
     // needs to be in the same object
     const rows = Object.keys(this.gravitationalField);
+    const centerRow = rows[Math.floor(rows.length/2)];
+    // console.log(centerRow);
     rows.forEach( row => {
-      const cols = Object.keys(row);
+      const cols = Object.keys(this.gravitationalField[row]);
+      const dRowCenter = distanceY(centerRow, row);
       cols.forEach( col => {
-        this.gravitationalField[row][col] = 0;
+        // prevent clustering on edges
+        this.gravitationalField[row][col] = this.fieldEdgeSgn*(dRowCenter / centerRow)/1000;
       });
     });
+    // debugger;
   }
 
   calculateField() {
@@ -43,7 +48,6 @@ export default class OrganismsController {
     this.organisms.forEach( organism => {
       this.updateField(organism);
     });
-    // console.log(this.gravitationalField);
   }
 
   updateField(organism) {

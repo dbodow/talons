@@ -6,6 +6,7 @@ export default class PredatorsController extends OrganismsController {
     super(ctx, panoramaWidth, panoramaHeight, preysParams);
     this.preyParams = preysParams.preyParams;
     this.populatePreys(preysParams.count);
+    this.fieldEdgeSgn = -1;
   }
 
   populatePreys(count) {

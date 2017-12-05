@@ -29,7 +29,7 @@ export const fieldCellCoords = (x, y, fieldNetSize) => ({
 export const gravitation = dist => {
   if (dist === 0) {
     // avoid singularities;
-    return 4;
+    return 100;
   } else {
     return Math.pow(dist, -2);
   }

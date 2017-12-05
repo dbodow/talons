@@ -108,10 +108,10 @@ export default class Organism {
   }
 
   updateDirection() {
-    const totalSpeed = Math.sqrt( Math.pow(this.direction.x + this.gradient.x, 2) +
-                                  Math.pow(this.direction.y + this.gradient.y, 2));
+    const totalSpeed = Math.sqrt( Math.pow(this.direction.x + (this.gradient.x / 10), 2) +
+                                  Math.pow(this.direction.y + (this.gradient.y / 10), 2));
     const normalization = 1 / totalSpeed;
-    this.direction.x = (this.direction.x + this.gradient.x) * normalization;
-    this.direction.y = (this.direction.y + this.gradient.y) * normalization;
+    this.direction.x = (this.direction.x + (this.gradient.x / 10)) * normalization;
+    this.direction.y = (this.direction.y + (this.gradient.y / 10)) * normalization;
   }
 }
