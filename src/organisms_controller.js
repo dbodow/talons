@@ -6,12 +6,11 @@ export default class OrganismsController {
     this.panoramaWidth = panoramaWidth;
     this.panoramaHeight = panoramaHeight;
     this.organisms = [];
+    this.locations = [];
     this.fieldNetSize = fieldNetSize;
     this.gravitationNbhd = gravitationNbhd;
     this.initializeField();
   }
-
-
 
   draw(dx) {
     this.organisms.forEach( organism => {
@@ -63,5 +62,15 @@ export default class OrganismsController {
         this.gravitationalField[row][proxyCol] += pointVector;
       }
     }
+  }
+
+  killOrganisms(condemnedList) {
+    condemnedList.forEach( organism => {
+      const condemnedIdx = this.organisms.indexOf(organism);
+      // debugger;
+      this.organisms.splice(condemnedIdx, 1);
+      // const survivors = this.organisms.slice(0, condemnedIdx).concat(this.organisms.slice(condemnedIdx + 1));
+      // this.organisms = survivors;
+    });
   }
 }

@@ -42,5 +42,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
   setInterval(() => {
     panorama.updateDx();
     panorama.draw();
-  }, 42); //42 mHz = 24 fps
+  }, 500); //42 mHz = 24 fps
 });

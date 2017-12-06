@@ -5,8 +5,8 @@ export default class PredatorsController extends OrganismsController {
   constructor(predatorsParams, ctx, panoramaWidth, panoramaHeight) {
     super(ctx, panoramaWidth, panoramaHeight, predatorsParams);
     this.predatorParams = predatorsParams.predatorParams;
-    this.populatePredators(predatorsParams.count);
     this.fieldEdgeSgn = 1;
+    this.populatePredators(predatorsParams.count);
   }
 
   populatePredators(count) {
@@ -15,8 +15,9 @@ export default class PredatorsController extends OrganismsController {
     }
   }
 
-  receivePreysField(field) {
-    this.preysField = field;
+  receivePreysData({preysField, preysLocations}) {
+    this.preysField = preysField;
+    this.preysLocations = preysLocations;
   }
 
   createPredator(predatorParams) {
@@ -31,4 +32,24 @@ export default class PredatorsController extends OrganismsController {
     });
   }
 
+  feed() {
+    const eaten = [];
+    this.organisms.forEach( predator => {
+      const food = predator.feed(this.preysLocations);
+      if (food) eaten.push(food);
+    });
+    // console.log('eaten ', eaten);
+    return Array.from(new Set(eaten));
+  }
+
+  starvePredators() {
+    const starved = [];
+    const currentTime = Date.now();
+    this.organisms.forEach( predator => {
+      if (currentTime - predator.lastAte > predator.efficiency) {
+        starved.push(predator);
+      }
+    });
+    this.killOrganisms(starved);
+  }
 }

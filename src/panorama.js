@@ -16,8 +16,13 @@ export default class Panorama {
     this.canvasHeight = backgroundParams.canvas.height;
     this.predatorsController = new PredatorsController(userParams.predatorsParams(), this.ctx, this.panoramaWidth, this.panoramaHeight);
     this.preyController = new PreyController(userParams.preysParams(), this.ctx, this.panoramaWidth, this.panoramaHeight);
-    this.predatorsController.receivePreysField(this.preyController.gravitationalField);
-    this.preyController.receivePredatorsField(this.predatorsController.gravitationalField);
+    this.predatorsController.receivePreysData({
+      preysField: this.preyController.gravitationalField,
+      preysLocations: this.preyController.locations
+    });
+    this.preyController.receivePredatorsData({
+      predatorsField: this.predatorsController.gravitationalField
+    });
     // defaults
     this.dx = 0;
     this.isDampening = false;
@@ -25,7 +30,6 @@ export default class Panorama {
   }
 
   draw(dx) {
-    // console.log('new draw');
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.background.draw(this.dx);
     this.preyController.calculateField();
@@ -34,6 +38,10 @@ export default class Panorama {
     this.preyController.draw(this.dx);
     this.predatorsController.draw(this.dx);
     this.predatorsController.updateDirections();
+    this.preyController.updateLocations();
+    const eaten = this.predatorsController.feed();
+    this.preyController.killOrganisms(eaten);
+    this.predatorsController.starvePredators();
   }
 
   updateDx() {

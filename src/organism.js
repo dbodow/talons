@@ -16,6 +16,7 @@ export default class Organism {
   initializeCenter() {
     this.centerX = Math.random() * this.panoramaWidth;
     this.centerY = Math.random() * (this.panoramaHeight - 2 * this.radius) + this.radius;
+    if (isNaN(this.centerX) || isNaN(this.centerY)) debugger;
   }
 
   initializeDirection() {
@@ -44,6 +45,7 @@ export default class Organism {
   moveOrganism() {
     this.centerX = positiveMod(this.centerX + this.xMovement(), this.panoramaWidth);
     this.centerY += this.yMovement();
+    // if (isNaN(this.centerX) || isNaN(this.centerY)) debugger;
     this.resolveBounces();
   }
 
