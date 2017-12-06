@@ -1,7 +1,7 @@
 'use strict';
 
 export default class Field {
-  constructor() {
+  constructor(sgn) {
 
   }
 
@@ -29,9 +29,9 @@ export default class Field {
     // debugger;
   }
 
-  calculateField() {
+  calculateField(organismsController) {
     this.resetField();
-    this.organisms.forEach( organism => {
+    organismsController.organisms.forEach( organism => {
       this.updateField(organism);
     });
   }
@@ -47,6 +47,38 @@ export default class Field {
         if (proxyCol < 0 || proxyCol >= this.panoramaWidth / this.fieldNetSize) proxyCol = positiveMod(proxyCol, Math.floor(this.panoramaWidth / this.fieldNetSize));
         const pointVector = gravitation(distance(position.x, position.y, proxyCol, row, this.panoramaWidth));
         this.gravitationalField[row][proxyCol] += pointVector;
+      }
+    }
+  }
+
+  // calculate the current position in the discrete field for an organism
+  updateFieldPosition(fieldNetSize) {
+    // debugger;
+    this.fieldPosition = fieldCellCoords(this.centerX, this.centerY, fieldNetSize);
+  }
+
+  // use the field of other organisms to construct a gradient for an organism
+  constructGradient(panoramaCenter) {
+    this.gradient = {
+      x: 0,
+      y: 0
+    };
+    for (let row = this.fieldPosition.y - gravitationNbhd; row < this.fieldPosition.y + gravitationNbhd; row++) {
+      for (let col = this.fieldPosition.x - gravitationNbhd; col < this.fieldPosition.x + gravitationNbhd; col++) {
+        let proxyCol = col;
+        if (row < 0 || row >= this.panoramaHeight / fieldNetSize) continue;
+        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / fieldNetSize) proxyCol = positiveMod(proxyCol, Math.floor(this.panoramaWidth / fieldNetSize));
+        if (col === this.fieldPosition.x || row === this.fieldPosition.y) continue;
+        const dist = distance(col, row, this.fieldPosition.x, this.fieldPosition.y, this.panoramaWidth);
+        const weight = gravitation(dist);
+        const xDist = distanceX(this.fieldPosition.x, col, this.panoramaWidth);
+        const yDist = distanceY(this.fieldPosition.y, row);
+        const sin = yDist / dist;
+        const cos = xDist / dist;
+        const sgnX = (col > this.fieldPosition.x) ? 1 : -1 ;
+        const sgnY = (row > this.fieldPosition.y) ? 1 : -1 ;
+        this.gradient.x += field[row][proxyCol] * cos * weight * sgnX;
+        this.gradient.y += field[row][proxyCol] * sin * weight * sgnY;
       }
     }
   }

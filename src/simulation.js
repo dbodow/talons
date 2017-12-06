@@ -16,6 +16,7 @@ export default class Simulation {
   begin() {
     this.ticker = setInterval(() => {
       this.panorama.updateDx();
+      this.zoo.tick();
       this.panorama.draw(this.zoo);
     }, 42); //42 mHz = 24 fps
   }

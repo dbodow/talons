@@ -19,21 +19,24 @@ export default class Panorama {
     this.setCanvasListeners(canvas);
   }
 
-  draw(dx, zoo) {
+  draw(zoo) {
     this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
     this.background.draw(this.dx);
-    zoo.preysController.organisms.forEach( prey => {
-      this.drawOrganism(prey);
-    });
-    zoo.predatorsController.organisms.forEach( predator => {
-      this.drawOrganism(predator);
+    this.drawOrganisms(zoo.preysController);
+    this.drawOrganisms(zoo.predatorsController);
+  }
+
+  drawOrganisms(controller) {
+    controller.organisms.forEach( organism => {
+      this.drawOrganism(organism);
     });
   }
 
   drawOrganism(organism) {
+    // debugger;
     this.ctx.beginPath();
-    this.ctx.arc(positiveMod(organism.centerX - this.dx, this.panoramaSize.width),
-                 organism.centerY, organism.radius, 0, 2 * Math.PI);
+    this.ctx.arc(positiveMod(organism.center.x - this.dx, this.panoramaSize.width),
+                 organism.center.y, organism.radius, 0, 2 * Math.PI);
     this.ctx.fillStyle = organism.color;
     this.ctx.fill();
   }

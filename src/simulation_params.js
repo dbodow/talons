@@ -6,13 +6,13 @@
 export default class SimulationParams {
   constructor() {
     //set defaults
-    this.predatorCount = 0;
+    this.predatorCount = 10;
     this.predatorSpeed = 20;
     this.predatorRadius = 40;
     this.predatorGravitationNbhd = 10;
     this.predatorColor = '#bc482b';
     this.predatorEfficiency = 2000000;
-    this.preyCount = 1;
+    this.preyCount = 10;
     this.preySpeed = 10;
     this.preyRadius = 20;
     this.preyGravitationNbhd = 20;
@@ -22,8 +22,6 @@ export default class SimulationParams {
 
   predatorsParams() {
     return {
-      fieldNetSize: this.fieldNetSize,
-      gravitationNbhd: this.predatorGravitationNbhd,
       count: this.predatorCount,
       predatorParams: {
         speed: this.predatorSpeed,
@@ -36,8 +34,6 @@ export default class SimulationParams {
 
   preysParams() {
     return {
-      fieldNetSize: this.fieldNetSize,
-      gravitationNbhd: this.preyGravitationNbhd,
       count: this.preyCount,
       preyParams: {
         speed: this.preySpeed,
