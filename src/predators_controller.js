@@ -1,3 +1,5 @@
+'use strict';
+
 import Predator from './predator';
 import OrganismsController from './organisms_controller';
 

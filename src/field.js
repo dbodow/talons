@@ -1,23 +1,8 @@
 'use strict';
 
-import { distance, distanceY, positiveMod, gravitation } from '../util/util';
+export default class Field {
+  constructor() {
 
-export default class OrganismsController {
-  constructor(ctx, panoramaWidth, panoramaHeight, {fieldNetSize, gravitationNbhd}) {
-    this.ctx = ctx;
-    this.panoramaWidth = panoramaWidth;
-    this.panoramaHeight = panoramaHeight;
-    this.organisms = [];
-    this.locations = [];
-    this.fieldNetSize = fieldNetSize;
-    this.gravitationNbhd = gravitationNbhd;
-    this.initializeField();
-  }
-
-  draw(dx) {
-    this.organisms.forEach( organism => {
-      organism.draw(dx);
-    });
   }
 
   initializeField() {
@@ -64,15 +49,5 @@ export default class OrganismsController {
         this.gravitationalField[row][proxyCol] += pointVector;
       }
     }
-  }
-
-  killOrganisms(condemnedList) {
-    condemnedList.forEach( organism => {
-      const condemnedIdx = this.organisms.indexOf(organism);
-      // debugger;
-      this.organisms.splice(condemnedIdx, 1);
-      // const survivors = this.organisms.slice(0, condemnedIdx).concat(this.organisms.slice(condemnedIdx + 1));
-      // this.organisms = survivors;
-    });
   }
 }

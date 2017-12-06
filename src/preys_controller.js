@@ -1,9 +1,11 @@
+'use strict';
+
 import Prey from './prey';
 import OrganismsController from './organisms_controller';
 import { fieldCellCoords } from '../util/util';
 
 
-export default class PredatorsController extends OrganismsController {
+export default class PreysController extends OrganismsController {
   constructor(preysParams, ctx, panoramaWidth, panoramaHeight) {
     super(ctx, panoramaWidth, panoramaHeight, preysParams);
     this.preyParams = preysParams.preyParams;

@@ -68,10 +68,12 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+
+
 const positiveMod = (n, m) => (
   ((n % m) + m) % m
 );
-/* harmony export (immutable) */ __webpack_exports__["f"] = positiveMod;
+/* harmony export (immutable) */ __webpack_exports__["g"] = positiveMod;
 
 
 // computed the horizontal distance between two points
@@ -114,7 +116,18 @@ const gravitation = dist => {
     return Math.pow(dist, -2);
   }
 };
-/* harmony export (immutable) */ __webpack_exports__["e"] = gravitation;
+/* harmony export (immutable) */ __webpack_exports__["f"] = gravitation;
+
+
+// inspired by https://stackoverflow.com/questions/1114465/getting-mouse-location-in-canvas
+const getMousePos = (canvas, e) => {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
+/* harmony export (immutable) */ __webpack_exports__["e"] = getMousePos;
 
 
 
@@ -124,6 +137,8 @@ const gravitation = dist => {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_util__ = __webpack_require__(0);
+
+
 
 
 class Organism {
@@ -162,13 +177,13 @@ class Organism {
   renderOrganism(dx) {
     // console.log('rendering organism');
     this.ctx.beginPath();
-    this.ctx.arc(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* positiveMod */])(this.centerX - dx, this.panoramaWidth), this.centerY, this.radius, 0, 2 * Math.PI);
+    this.ctx.arc(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* positiveMod */])(this.centerX - dx, this.panoramaWidth), this.centerY, this.radius, 0, 2 * Math.PI);
     this.ctx.fillStyle = this.color;
     this.ctx.fill();
   }
 
   moveOrganism() {
-    this.centerX = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* positiveMod */])(this.centerX + this.xMovement(), this.panoramaWidth);
+    this.centerX = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* positiveMod */])(this.centerX + this.xMovement(), this.panoramaWidth);
     this.centerY += this.yMovement();
     // if (isNaN(this.centerX) || isNaN(this.centerY)) debugger;
     this.resolveBounces();
@@ -218,10 +233,10 @@ class Organism {
       for (let col = this.fieldPosition.x - gravitationNbhd; col < this.fieldPosition.x + gravitationNbhd; col++) {
         let proxyCol = col;
         if (row < 0 || row >= this.panoramaHeight / fieldNetSize) continue;
-        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / fieldNetSize) proxyCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* positiveMod */])(proxyCol, Math.floor(this.panoramaWidth / fieldNetSize));
+        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / fieldNetSize) proxyCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* positiveMod */])(proxyCol, Math.floor(this.panoramaWidth / fieldNetSize));
         if (col === this.fieldPosition.x || row === this.fieldPosition.y) continue;
         const dist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* distance */])(col, row, this.fieldPosition.x, this.fieldPosition.y, this.panoramaWidth);
-        const weight = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["e" /* gravitation */])(dist);
+        const weight = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* gravitation */])(dist);
         const xDist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["b" /* distanceX */])(this.fieldPosition.x, col, this.panoramaWidth);
         const yDist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["c" /* distanceY */])(this.fieldPosition.y, row);
         const sin = yDist / dist;
@@ -252,6 +267,8 @@ class Organism {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_util__ = __webpack_require__(0);
+
+
 
 
 class OrganismsController {
@@ -311,8 +328,8 @@ class OrganismsController {
         // JS will get mad if you try to change the iterator mid loop.
         let proxyCol = col;
         if (row < 0 || row >= this.panoramaHeight / this.fieldNetSize) continue;
-        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / this.fieldNetSize) proxyCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* positiveMod */])(proxyCol, Math.floor(this.panoramaWidth / this.fieldNetSize));
-        const pointVector = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["e" /* gravitation */])(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* distance */])(position.x, position.y, proxyCol, row, this.panoramaWidth));
+        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / this.fieldNetSize) proxyCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* positiveMod */])(proxyCol, Math.floor(this.panoramaWidth / this.fieldNetSize));
+        const pointVector = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* gravitation */])(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* distance */])(position.x, position.y, proxyCol, row, this.panoramaWidth));
         this.gravitationalField[row][proxyCol] += pointVector;
       }
     }
@@ -338,53 +355,20 @@ class OrganismsController {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__panorama__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__user_params__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__simulation_params__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__simulation__ = __webpack_require__(12);
 
 
 
-// non-user params
-const backgroundPath = 'https://s3-us-west-1.amazonaws.com/talons-dev/placeholder-background.jpeg';
 
-// inspired by https://stackoverflow.com/questions/1114465/getting-mouse-location-in-canvas
-function getMousePos(canvas, e) {
-  const rect = canvas.getBoundingClientRect();
-  return {
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top
-  };
-}
+
+// This file manages interaction with the HTML document
 
 document.addEventListener("DOMContentLoaded", function(event) {
   const canvas = document.getElementById("canvas");
-  const backgroundImage = new Image;
-  backgroundImage.src = backgroundPath;
-
-  const userParams = new __WEBPACK_IMPORTED_MODULE_1__user_params__["a" /* default */](backgroundImage);
-  userParams.setListeners();
-
-  const backgroundParams = {
-    canvas,
-    backgroundImage
-  };
-  const panorama = new __WEBPACK_IMPORTED_MODULE_0__panorama__["a" /* default */](backgroundParams, userParams);
-
-  let mousePos;
-  panorama.draw();
-
-  canvas.addEventListener('mousemove', e => {
-    mousePos = getMousePos(canvas, e);
-    panorama.updateCursorOffset(mousePos);
-  });
-
-  canvas.addEventListener('mouseout', () => {
-    panorama.toggleDampening(true);
-  });
-
-  setInterval(() => {
-    panorama.updateDx();
-    panorama.draw();
-  }, 500); //42 mHz = 24 fps
+  const simulationParams = new __WEBPACK_IMPORTED_MODULE_0__simulation_params__["a" /* default */];
+  const simulation = new __WEBPACK_IMPORTED_MODULE_1__simulation__["a" /* default */](canvas, simulationParams);
+  simulation.begin();
 });
 
 
@@ -394,59 +378,51 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__background__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__predators_controller__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__prey_controller__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util_util__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_util__ = __webpack_require__(0);
 
 
 
 
 
+// handles all logic for the wrapping panorama and drawing all canvas items
+// in particular, tracks offset for drawing based on user scroll
 class Panorama {
-  constructor(backgroundParams, userParams) {
-    // inputs
-    this.userParams = userParams;
-    this.background = new __WEBPACK_IMPORTED_MODULE_0__background__["a" /* default */](backgroundParams);
-    this.ctx = backgroundParams.canvas.getContext('2d');
-    this.img = backgroundParams.backgroundImage;
-    this.panoramaWidth = this.img.width;
-    this.panoramaHeight = this.img.height;
-    this.canvasWidth = backgroundParams.canvas.width;
-    this.canvasHeight = backgroundParams.canvas.height;
-    this.predatorsController = new __WEBPACK_IMPORTED_MODULE_1__predators_controller__["a" /* default */](userParams.predatorsParams(), this.ctx, this.panoramaWidth, this.panoramaHeight);
-    this.preyController = new __WEBPACK_IMPORTED_MODULE_2__prey_controller__["a" /* default */](userParams.preysParams(), this.ctx, this.panoramaWidth, this.panoramaHeight);
-    this.predatorsController.receivePreysData({
-      preysField: this.preyController.gravitationalField,
-      preysLocations: this.preyController.locations
-    });
-    this.preyController.receivePredatorsData({
-      predatorsField: this.predatorsController.gravitationalField
-    });
-    // defaults
+  constructor(canvas) {
+    this.background = new __WEBPACK_IMPORTED_MODULE_0__background__["a" /* default */](canvas);
+    this.ctx = canvas.getContext('2d');
+    this.panoramaSize = this.background.imageSize;
+    this.canvasSize = this.background.canvasSize;
+
     this.dx = 0;
     this.isDampening = false;
     this.cursorOffsetX = 0;
+
+    this.setCanvasListeners(canvas);
   }
 
-  draw(dx) {
-    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+  draw(dx, zoo) {
+    this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
     this.background.draw(this.dx);
-    this.preyController.calculateField();
-    this.predatorsController.calculateField();
-    this.preyController.updateDirections();
-    this.preyController.draw(this.dx);
-    this.predatorsController.draw(this.dx);
-    this.predatorsController.updateDirections();
-    this.preyController.updateLocations();
-    const eaten = this.predatorsController.feed();
-    this.preyController.killOrganisms(eaten);
-    this.predatorsController.starvePredators();
+    zoo.preysController.organisms.forEach( prey => {
+      this.drawOrganism(prey);
+    });
+    zoo.predatorsController.organisms.forEach( predator => {
+      this.drawOrganism(predator);
+    });
+  }
+
+  drawOrganism(organism) {
+    this.ctx.beginPath();
+    this.ctx.arc(Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["g" /* positiveMod */])(organism.centerX - this.dx, this.panoramaSize.width),
+                 organism.centerY, organism.radius, 0, 2 * Math.PI);
+    this.ctx.fillStyle = organism.color;
+    this.ctx.fill();
   }
 
   updateDx() {
     this.dampenStaleCursorInput();
     this.dx += this.cursorOffsetX * 0.075;
-    this.dx = Object(__WEBPACK_IMPORTED_MODULE_3__util_util__["f" /* positiveMod */])(this.dx, this.panoramaWidth);
+    this.dx = Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["g" /* positiveMod */])(this.dx, this.panoramaSize.width);
   }
 
   toggleDampening(bool) {
@@ -463,13 +439,26 @@ class Panorama {
   }
 
   updateCursorOffset({x}) {
-    if (Math.abs(this.canvasWidth / 2 - x) > this.canvasWidth / 3) {
+    if (Math.abs(this.canvasSize.width / 2 - x) > this.canvasSize.width / 3) {
       this.toggleDampening(false);
-      this.cursorOffsetX = x - (this.canvasWidth / 2);
+      this.cursorOffsetX = x - (this.canvasSize.width / 2);
     } else {
       this.toggleDampening(true);
     }
   }
+
+  setCanvasListeners(canvas) {
+    canvas.addEventListener('mousemove', e => {
+      const mousePos = Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["e" /* getMousePos */])(canvas, e);
+      this.updateCursorOffset(mousePos);
+    });
+
+    canvas.addEventListener('mouseout', () => {
+      this.toggleDampening(true);
+    });
+  }
+
+
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Panorama;
 
@@ -480,33 +469,36 @@ class Panorama {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+
+
+const backgroundPath = 'https://s3-us-west-1.amazonaws.com/talons-dev/placeholder-background.jpeg';
+
 class Background {
   // eventually refactor into background and panorama classes
-  constructor({canvas, backgroundImage}) {
+  constructor(canvas) {
     this.ctx = canvas.getContext('2d');
-    this.img = backgroundImage;
-    this.imageWidth = this.img.width;
-    this.imageHeight = this.img.height;
-    this.canvasWidth = canvas.width;
-    this.canvasHeight = canvas.height;
-    this.cursorOffsetX = 0;
-    this.dx = 0; // mainly for graceful error handling
+    this.img = new Image;
+    this.img.src = backgroundPath;
+    this.imageSize = {
+      width: this.img.width,
+      height: this.img.height
+    };
+    this.canvasSize = {
+      width: canvas.width,
+      height: canvas.height
+    };
   }
 
   draw(dx) {
-    // console.log('rendering bg');
-    this.dx = dx;
-    // future optimization: only redraw if any scrolling has occured
-    this.ctx.drawImage(this.img, -this.dx, 0);
+    this.ctx.drawImage(this.img, -dx, 0);
     // only perform second draw of stitched image when necessary
-    if (this.doesImageNeedStitching()) {
-      // console.log('rendering stitch');
-      this.ctx.drawImage(this.img, this.imageWidth - this.dx, 0);
+    if (this.doesImageNeedStitching(dx)) {
+      this.ctx.drawImage(this.img, this.imageSize.width - dx, 0);
     }
   }
 
-  doesImageNeedStitching() {
-    return this.dx > (this.imageWidth - this.canvasWidth);
+  doesImageNeedStitching(dx) {
+    return dx > (this.imageSize.width - this.canvasSize.width);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Background;
@@ -520,6 +512,8 @@ class Background {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__predator__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(2);
+
+
 
 
 
@@ -587,6 +581,8 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__organism__ = __webpack_require__(1);
 
 
+
+
 class Predator extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
   constructor(predatorParams, ctx, panoramaWidth, panoramaHeight) {
     super(predatorParams, ctx, panoramaWidth, panoramaHeight);
@@ -611,7 +607,162 @@ class Predator extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */
 
 
 /***/ }),
-/* 8 */
+/* 8 */,
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__organism__ = __webpack_require__(1);
+
+
+
+
+class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
+  constructor(preyParams, ctx, panoramaWidth, panoramaHeight) {
+    super(preyParams, ctx, panoramaWidth, panoramaHeight);
+  }
+
+  flipGradient() {
+    // run from the predators, not to them
+    this.gradient.x = -1 * this.gradient.x;
+    this.gradient.y = -1 * this.gradient.y;
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Prey;
+
+
+
+/***/ }),
+/* 10 */,
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+
+// SimulationParams: controls the parameters for the simulation.
+// Allows users to adjust input; manages event listeners to
+// determine this input.
+class SimulationParams {
+  constructor() {
+    //set defaults
+    this.predatorCount = 0;
+    this.predatorSpeed = 20;
+    this.predatorRadius = 40;
+    this.predatorGravitationNbhd = 10;
+    this.predatorColor = '#bc482b';
+    this.predatorEfficiency = 2000000;
+    this.preyCount = 1;
+    this.preySpeed = 10;
+    this.preyRadius = 20;
+    this.preyGravitationNbhd = 20;
+    this.preyColor = '#4c6ea5';
+    this.fieldNetSize = 10; // Must be smaller than radius/sqrt(2)!
+  }
+
+  predatorsParams() {
+    return {
+      fieldNetSize: this.fieldNetSize,
+      gravitationNbhd: this.predatorGravitationNbhd,
+      count: this.predatorCount,
+      predatorParams: {
+        speed: this.predatorSpeed,
+        radius: this.predatorRadius,
+        color: this.predatorColor,
+        efficiency: this.predatorEfficiency
+      }
+    };
+  }
+
+  preysParams() {
+    return {
+      fieldNetSize: this.fieldNetSize,
+      gravitationNbhd: this.preyGravitationNbhd,
+      count: this.preyCount,
+      preyParams: {
+        speed: this.preySpeed,
+        radius: this.preyRadius,
+        color: this.preyColor
+      }
+    };
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = SimulationParams;
+
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__panorama__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__zoo__ = __webpack_require__(13);
+
+
+
+
+
+class Simulation {
+  constructor(canvas, simulationParams) {
+    this.canvas = canvas;
+    this.simulationParams = simulationParams;
+    this.panorama = new __WEBPACK_IMPORTED_MODULE_0__panorama__["a" /* default */](this.canvas);
+    this.zoo = new __WEBPACK_IMPORTED_MODULE_1__zoo__["a" /* default */](this.simulationParams.predatorsParams(),
+                       this.simulationParams.preysParams(),
+                       this.panorama.panoramaSize);
+  }
+
+  begin() {
+    this.ticker = setInterval(() => {
+      this.panorama.updateDx();
+      this.panorama.draw(this.zoo);
+    }, 42); //42 mHz = 24 fps
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Simulation;
+
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__predators_controller__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__preys_controller__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__field__ = __webpack_require__(15);
+
+
+
+
+
+
+class Zoo {
+  constructor(predatorsParams, preysParams, panoramaSize) {
+    this.predatorsController = new __WEBPACK_IMPORTED_MODULE_0__predators_controller__["a" /* default */](predatorsParams);
+    this.preysController = new __WEBPACK_IMPORTED_MODULE_1__preys_controller__["a" /* default */](preysParams);
+    this.predatorsField = new __WEBPACK_IMPORTED_MODULE_2__field__["a" /* default */](this.predatorsController);
+    this.preysField = new __WEBPACK_IMPORTED_MODULE_2__field__["a" /* default */](this.preysController);
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Zoo;
+
+
+// this.preyController.calculateField();
+// this.predatorsController.calculateField();
+// this.preyController.updateDirections();
+// this.preyController.draw(this.dx);
+// this.predatorsController.draw(this.dx);
+// this.predatorsController.updateDirections();
+// this.preyController.updateLocations();
+// const eaten = this.predatorsController.feed();
+// this.preyController.killOrganisms(eaten);
+// this.predatorsController.starvePredators();
+
+
+/***/ }),
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -623,7 +774,9 @@ class Predator extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */
 
 
 
-class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller__["a" /* default */] {
+
+
+class PreysController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller__["a" /* default */] {
   constructor(preysParams, ctx, panoramaWidth, panoramaHeight) {
     super(ctx, panoramaWidth, panoramaHeight, preysParams);
     this.preyParams = preysParams.preyParams;
@@ -680,86 +833,69 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
     });
   }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = PredatorsController;
+/* harmony export (immutable) */ __webpack_exports__["a"] = PreysController;
 
 
 
 /***/ }),
-/* 9 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__organism__ = __webpack_require__(1);
 
 
-class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
-  constructor(preyParams, ctx, panoramaWidth, panoramaHeight) {
-    super(preyParams, ctx, panoramaWidth, panoramaHeight);
+class Field {
+  constructor() {
+
   }
 
-  flipGradient() {
-    // run from the predators, not to them
-    this.gradient.x = -1 * this.gradient.x;
-    this.gradient.y = -1 * this.gradient.y;
+  initializeField() {
+    const rowCount = Math.ceil(this.panoramaHeight / this.fieldNetSize);
+    const colCount = Math.ceil(this.panoramaWidth / this.fieldNetSize);
+    this.gravitationalField = Array(rowCount).fill(0).map(el => (
+      Array(colCount).fill(0)
+    ));
+  }
+
+  resetField() {
+    // needs to be in the same object
+    const rows = Object.keys(this.gravitationalField);
+    const centerRow = rows[Math.floor(rows.length/2)];
+    // console.log(centerRow);
+    rows.forEach( row => {
+      const cols = Object.keys(this.gravitationalField[row]);
+      const dRowCenter = distanceY(centerRow, row);
+      cols.forEach( col => {
+        // prevent clustering on edges
+        this.gravitationalField[row][col] = this.fieldEdgeSgn*(dRowCenter / centerRow)/1000;
+      });
+    });
+    // debugger;
+  }
+
+  calculateField() {
+    this.resetField();
+    this.organisms.forEach( organism => {
+      this.updateField(organism);
+    });
+  }
+
+  updateField(organism) {
+    organism.updateFieldPosition(this.fieldNetSize);
+    const position = organism.fieldPosition;
+    for(let row = position.y - this.gravitationNbhd; row < position.y + this.gravitationNbhd; row++) {
+      for(let col = position.x - this.gravitationNbhd; col < position.x + this.gravitationNbhd; col++) {
+        // JS will get mad if you try to change the iterator mid loop.
+        let proxyCol = col;
+        if (row < 0 || row >= this.panoramaHeight / this.fieldNetSize) continue;
+        if (proxyCol < 0 || proxyCol >= this.panoramaWidth / this.fieldNetSize) proxyCol = positiveMod(proxyCol, Math.floor(this.panoramaWidth / this.fieldNetSize));
+        const pointVector = gravitation(distance(position.x, position.y, proxyCol, row, this.panoramaWidth));
+        this.gravitationalField[row][proxyCol] += pointVector;
+      }
+    }
   }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Prey;
-
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-// basically a reducer...
-class Controls {
-  constructor(backgroundImage) {
-    //set defaults
-    this.predatorCount = 0;
-    this.predatorSpeed = 20;
-    this.predatorRadius = 40;
-    this.predatorColor = '#bc482b';
-    this.predatorEfficiency = 2000000;
-    this.preyCount = 1;
-    this.preySpeed = 10;
-    this.preyRadius = 20;
-    this.preyColor = '#4c6ea5';
-    this.backgroundImage = backgroundImage;
-  }
-
-  predatorsParams() {
-    return {
-      fieldNetSize: 10, // Must be smaller than radius/sqrt(2)!
-      gravitationNbhd: 10,
-      count: this.predatorCount,
-      predatorParams: {
-        speed: this.predatorSpeed,
-        radius: this.predatorRadius,
-        color: this.predatorColor,
-        efficiency: this.predatorEfficiency
-      }
-    };
-  }
-
-  preysParams() {
-    return {
-      fieldNetSize: 10, // Must be smaller than radius/sqrt(2)!
-      gravitationNbhd: 20,
-      count: this.preyCount,
-      preyParams: {
-        speed: this.preySpeed,
-        radius: this.preyRadius,
-        color: this.preyColor
-      }
-    };
-  }
-
-  setListeners() {
-    // will set several event listeners in document to grab user input
-  }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Controls;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Field;
 
 
 

@@ -1,29 +1,32 @@
+'use strict';
+
+const backgroundPath = 'https://s3-us-west-1.amazonaws.com/talons-dev/placeholder-background.jpeg';
+
 export default class Background {
   // eventually refactor into background and panorama classes
-  constructor({canvas, backgroundImage}) {
+  constructor(canvas) {
     this.ctx = canvas.getContext('2d');
-    this.img = backgroundImage;
-    this.imageWidth = this.img.width;
-    this.imageHeight = this.img.height;
-    this.canvasWidth = canvas.width;
-    this.canvasHeight = canvas.height;
-    this.cursorOffsetX = 0;
-    this.dx = 0; // mainly for graceful error handling
+    this.img = new Image;
+    this.img.src = backgroundPath;
+    this.imageSize = {
+      width: this.img.width,
+      height: this.img.height
+    };
+    this.canvasSize = {
+      width: canvas.width,
+      height: canvas.height
+    };
   }
 
   draw(dx) {
-    // console.log('rendering bg');
-    this.dx = dx;
-    // future optimization: only redraw if any scrolling has occured
-    this.ctx.drawImage(this.img, -this.dx, 0);
+    this.ctx.drawImage(this.img, -dx, 0);
     // only perform second draw of stitched image when necessary
-    if (this.doesImageNeedStitching()) {
-      // console.log('rendering stitch');
-      this.ctx.drawImage(this.img, this.imageWidth - this.dx, 0);
+    if (this.doesImageNeedStitching(dx)) {
+      this.ctx.drawImage(this.img, this.imageSize.width - dx, 0);
     }
   }
 
-  doesImageNeedStitching() {
-    return this.dx > (this.imageWidth - this.canvasWidth);
+  doesImageNeedStitching(dx) {
+    return dx > (this.imageSize.width - this.canvasSize.width);
   }
 }

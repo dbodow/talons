@@ -1,3 +1,5 @@
+'use strict';
+
 import Organism from './organism';
 
 export default class Predator extends Organism {

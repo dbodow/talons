@@ -1,3 +1,5 @@
+'use strict';
+
 import { positiveMod, fieldCellCoords, gravitation,
          distance, distanceX, distanceY } from '../util/util';
 

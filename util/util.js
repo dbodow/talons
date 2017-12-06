@@ -1,3 +1,5 @@
+'use strict';
+
 export const positiveMod = (n, m) => (
   ((n % m) + m) % m
 );
@@ -34,3 +36,12 @@ export const gravitation = dist => {
     return Math.pow(dist, -2);
   }
 };
+
+// inspired by https://stackoverflow.com/questions/1114465/getting-mouse-location-in-canvas
+export const getMousePos = (canvas, e) => {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
