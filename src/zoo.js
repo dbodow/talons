@@ -46,19 +46,17 @@ export default class Zoo {
     this.preysField.calculateField(this.preysController);
   }
 
+  // construct a hash of preys' locations on the field grid, with
+  // coords pointing to the top prey on a given tile (O(preys) time)
+  // Then, each predator can check the hash at its own location to
+  // find food (O(predators) time). Total: O(predators + preys)
   feed() {
-    const eaten = this.predatorsController.feed(this.preysController.organisms);
+    const preysLocations = this.calculatePreysLocations();
+    const eaten = this.predatorsController.feed(preysLocations, this.preysField.fieldNetSize);
     this.preysController.killOrganisms(eaten);
   }
-}
 
-// this.preyController.calculateField();
-// this.predatorsController.calculateField();
-// this.preyController.updateDirections();
-// this.preyController.draw(this.dx);
-// this.predatorsController.draw(this.dx);
-// this.predatorsController.updateDirections();
-// this.preyController.updateLocations();
-// const eaten = this.predatorsController.feed();
-// this.preyController.killOrganisms(eaten);
-// this.predatorsController.starvePredators();
+  calculatePreysLocations() {
+    return this.preysController.revealLocations(this.preysField.fieldNetSize);
+  }
+}

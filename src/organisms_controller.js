@@ -1,6 +1,7 @@
 'use strict';
 
-import { distance, distanceY, positiveMod, gravitation } from '../util/util';
+import { distance, distanceY, positiveMod,
+         gravitation } from '../util/util';
 
 export default class OrganismsController {
   constructor() {
@@ -20,13 +21,10 @@ export default class OrganismsController {
     });
   }
 
-  // killOrganisms(condemnedList) {
-  //   condemnedList.forEach( organism => {
-  //     const condemnedIdx = this.organisms.indexOf(organism);
-  //     // debugger;
-  //     this.organisms.splice(condemnedIdx, 1);
-  //     // const survivors = this.organisms.slice(0, condemnedIdx).concat(this.organisms.slice(condemnedIdx + 1));
-  //     // this.organisms = survivors;
-  //   });
-  // }
+  killOrganisms(condemnedList) {
+    condemnedList.forEach( organism => {
+      const condemnedIdx = this.organisms.indexOf(organism);
+      this.organisms.splice(condemnedIdx, 1);
+    });
+  }
 }

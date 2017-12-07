@@ -245,15 +245,12 @@ class OrganismsController {
     });
   }
 
-  // killOrganisms(condemnedList) {
-  //   condemnedList.forEach( organism => {
-  //     const condemnedIdx = this.organisms.indexOf(organism);
-  //     // debugger;
-  //     this.organisms.splice(condemnedIdx, 1);
-  //     // const survivors = this.organisms.slice(0, condemnedIdx).concat(this.organisms.slice(condemnedIdx + 1));
-  //     // this.organisms = survivors;
-  //   });
-  // }
+  killOrganisms(condemnedList) {
+    condemnedList.forEach( organism => {
+      const condemnedIdx = this.organisms.indexOf(organism);
+      this.organisms.splice(condemnedIdx, 1);
+    });
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = OrganismsController;
 
@@ -581,24 +578,22 @@ class Zoo {
     this.preysField.calculateField(this.preysController);
   }
 
+  // construct a hash of preys' locations on the field grid, with
+  // coords pointing to the top prey on a given tile (O(preys) time)
+  // Then, each predator can check the hash at its own location to
+  // find food (O(predators) time). Total: O(predators + preys)
   feed() {
-    const eaten = this.predatorsController.feed(this.preysController.organisms);
+    const preysLocations = this.calculatePreysLocations();
+    const eaten = this.predatorsController.feed(preysLocations, this.preysField.fieldNetSize);
     this.preysController.killOrganisms(eaten);
+  }
+
+  calculatePreysLocations() {
+    return this.preysController.revealLocations(this.preysField.fieldNetSize);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Zoo;
 
-
-// this.preyController.calculateField();
-// this.predatorsController.calculateField();
-// this.preyController.updateDirections();
-// this.preyController.draw(this.dx);
-// this.predatorsController.draw(this.dx);
-// this.predatorsController.updateDirections();
-// this.preyController.updateLocations();
-// const eaten = this.predatorsController.feed();
-// this.preyController.killOrganisms(eaten);
-// this.predatorsController.starvePredators();
 
 
 /***/ }),
@@ -608,6 +603,8 @@ class Zoo {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__predator__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_util__ = __webpack_require__(0);
+
 
 
 
@@ -630,16 +627,20 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
     this.organisms.push(predator);
   }
 
-  // feed() {
-  //   const eaten = [];
-  //   this.organisms.forEach( predator => {
-  //     const food = predator.feed(this.preysLocations);
-  //     if (food) eaten.push(food);
-  //   });
-  //   // console.log('eaten ', eaten);
-  //   return Array.from(new Set(eaten));
-  // }
-  //
+  feed(preysLocations, fieldNetSize) {
+    const eaten = [];
+    this.organisms.forEach( predator => {
+      const predatorCoords = Object(__WEBPACK_IMPORTED_MODULE_2__util_util__["d" /* fieldCellCoords */])(predator.center, fieldNetSize);
+      const food = preysLocations[predatorCoords.x] ?
+        preysLocations[predatorCoords.x][predatorCoords.y] : null;
+      if (food) {
+        eaten.push(food);
+        predator.feed();
+      }
+    });
+    return Array.from(new Set(eaten));
+  }
+
   // starvePredators() {
   //   const starved = [];
   //   const currentTime = Date.now();
@@ -672,17 +673,9 @@ class Predator extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */
     this.efficiency = predatorParams.efficiency;
   }
 
-  // feed(locations) {
-  //   // debugger;
-  //   const food = locations[this.fieldPosition.y][this.fieldPosition.x];
-  //   if (food) {
-  //     // if (Math.abs(food.centerX - this.centerX) > 10) console.log('problem, ', Date.now());
-  //     if (Math.abs(food.centerX - this.centerX) <= 10) console.log('no problem');
-  //     // console.log('food ', food, "me: ", this.centerX, this.centerY);
-  //     this.lastAte = Date.now();
-  //     return food;
-  //   }
-  // }
+  feed(preys) {
+    this.lastAte = Date.now();
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Predator;
 
@@ -696,7 +689,6 @@ class Predator extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__prey__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_util__ = __webpack_require__(0);
-
 
 
 
@@ -718,6 +710,16 @@ class PreysController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller_
   createPrey(preyParams, panoramaSize) {
     const prey = new __WEBPACK_IMPORTED_MODULE_0__prey__["a" /* default */](preyParams, panoramaSize);
     this.organisms.push(prey);
+  }
+
+  revealLocations(fieldNetSize) {
+    const locations = {};
+    this.organisms.forEach( prey => {
+      const preyCoords = Object(__WEBPACK_IMPORTED_MODULE_2__util_util__["d" /* fieldCellCoords */])(prey.center, fieldNetSize);
+      locations[preyCoords.x] = locations[preyCoords.x] || [];
+      locations[preyCoords.x][preyCoords.y] = prey;
+    });
+    return locations;
   }
 
   // initializeLocations() {

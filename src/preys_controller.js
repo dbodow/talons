@@ -4,7 +4,6 @@ import Prey from './prey';
 import OrganismsController from './organisms_controller';
 import { fieldCellCoords } from '../util/util';
 
-
 export default class PreysController extends OrganismsController {
   constructor(preysParams, panoramaSize) {
     super();
@@ -20,6 +19,16 @@ export default class PreysController extends OrganismsController {
   createPrey(preyParams, panoramaSize) {
     const prey = new Prey(preyParams, panoramaSize);
     this.organisms.push(prey);
+  }
+
+  revealLocations(fieldNetSize) {
+    const locations = {};
+    this.organisms.forEach( prey => {
+      const preyCoords = fieldCellCoords(prey.center, fieldNetSize);
+      locations[preyCoords.x] = locations[preyCoords.x] || [];
+      locations[preyCoords.x][preyCoords.y] = prey;
+    });
+    return locations;
   }
 
   // initializeLocations() {
