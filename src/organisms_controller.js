@@ -8,18 +8,17 @@ export default class OrganismsController {
   }
 
   moveOrganisms(panoramaSize, field) {
-    // this.updateDirections(field);
+    this.updateDirections(field);
     this.organisms.forEach( organism => {
       organism.moveOrganism(panoramaSize);
     });
   }
 
-  // updateDirections(field) {
-  //   this.organisms.forEach( organism => {
-  //     // organism.constructGradient(this.preysField, this.gravitationNbhd, this.fieldNetSize);
-  //     organism.updateDirection(field);
-  //   });
-  // }
+  updateDirections(field) {
+    this.organisms.forEach( organism => {
+      organism.updateDirection(field);
+    });
+  }
 
   // killOrganisms(condemnedList) {
   //   condemnedList.forEach( organism => {

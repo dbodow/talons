@@ -10,6 +10,8 @@ export default class Simulation {
     this.panorama = new Panorama(this.canvas);
     this.zoo = new Zoo(this.simulationParams.predatorsParams(),
                        this.simulationParams.preysParams(),
+                       this.simulationParams.predatorFieldParams(),
+                       this.simulationParams.preyFieldParams(),
                        this.panorama.panoramaSize);
   }
 

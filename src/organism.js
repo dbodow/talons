@@ -4,10 +4,11 @@ import { positiveMod, fieldCellCoords, gravitation,
          distance, distanceX, distanceY } from '../util/util';
 
 export default class Organism {
-  constructor({speed, radius, color}, panoramaSize) {
+  constructor({speed, radius, color, perception}, panoramaSize) {
     this.speed = speed;
     this.radius = radius;
     this.color = color;
+    this.perception = perception;
     this.initializeCenter(panoramaSize);
     this.initializeDirection();
   }
@@ -65,12 +66,12 @@ export default class Organism {
     }
   }
 
-  // updateDirection(field) {
-  //   const gradient = field.constructGradient(this.center);
-  //   const totalSpeed = Math.sqrt( Math.pow(this.direction.x + (gradient.x / 10), 2) +
-  //                                 Math.pow(this.direction.y + (gradient.y / 10), 2) );
-  //   const normalization = 1 / totalSpeed;
-  //   this.direction.x = (this.direction.x + (gradient.x / 10)) * normalization;
-  //   this.direction.y = (this.direction.y + (gradient.y / 10)) * normalization;
-  // }
+  updateDirection(field) {
+    const gradient = field.constructGradient(this);
+    const totalSpeed = Math.sqrt( Math.pow(this.direction.x + (gradient.x / this.perception), 2) +
+                                  Math.pow(this.direction.y + (gradient.y / this.perception), 2) );
+    const normalization = 1 / totalSpeed;
+    this.direction.x = (this.direction.x + (gradient.x / this.perception)) * normalization;
+    this.direction.y = (this.direction.y + (gradient.y / this.perception)) * normalization;
+  }
 }

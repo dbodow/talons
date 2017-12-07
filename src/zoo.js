@@ -5,17 +5,19 @@ import PreysController from './preys_controller';
 import Field from './field';
 
 export default class Zoo {
-  constructor(predatorsParams, preysParams, panoramaSize) {
+  constructor(predatorsParams, preysParams,
+              predatorFieldParams, preyFieldParams, panoramaSize) {
     this.panoramaSize = panoramaSize;
     this.predatorsController = new PredatorsController(predatorsParams, panoramaSize);
     this.preysController = new PreysController(preysParams, panoramaSize);
-    // this.predatorsField = new Field(panoramaSize, 1);
-    // this.preysField = new Field(panoramaSize, -1);
+    this.predatorsField = new Field(predatorFieldParams, panoramaSize, -1);
+    this.preysField = new Field(preyFieldParams, panoramaSize, 1);
   }
 
   tick() {
+    this.feed();
+    this.calculateFields();
     this.moveOrganisms();
-    // this.calculateFields();
   }
 
   moveOrganisms() {
@@ -36,12 +38,17 @@ export default class Zoo {
     this.calculatePreysField();
   }
 
-  calculatePredatorsFields() {
+  calculatePredatorsField() {
     this.predatorsField.calculateField(this.predatorsController);
   }
 
-  calculatePreysFields() {
+  calculatePreysField() {
     this.preysField.calculateField(this.preysController);
+  }
+
+  feed() {
+    const eaten = this.predatorsController.feed(this.preysController.organisms);
+    this.preysController.killOrganisms(eaten);
   }
 }
 

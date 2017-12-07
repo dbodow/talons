@@ -33,7 +33,6 @@ export default class Panorama {
   }
 
   drawOrganism(organism) {
-    // debugger;
     this.ctx.beginPath();
     this.ctx.arc(positiveMod(organism.center.x - this.dx, this.panoramaSize.width),
                  organism.center.y, organism.radius, 0, 2 * Math.PI);
