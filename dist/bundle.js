@@ -367,15 +367,17 @@ class SimulationParams {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__panorama__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__zoo__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(14);
+
 
 
 
 
 
 class Simulation {
-  constructor(canvas, graph, simulationParams) {
+  constructor(canvas, graphCanvas, simulationParams) {
     this.canvas = canvas;
-    this.graph = graph;
+    this.graph = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */](graphCanvas);
     this.simulationParams = simulationParams;
     this.panorama = new __WEBPACK_IMPORTED_MODULE_0__panorama__["a" /* default */](this.canvas);
     this.zoo = new __WEBPACK_IMPORTED_MODULE_1__zoo__["a" /* default */](this.simulationParams.predatorsParams(),
@@ -905,6 +907,43 @@ class Field {
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Field;
+
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Graph {
+  constructor(graphCanvas) {
+    this.graphCanvas = graphCanvas;
+    this.canvasSize = {
+      x: graphCanvas.width,
+      y: graphCanvas.height
+    };
+    this.ctx = graphCanvas.getContext('2d');
+  }
+
+  draw(zoo) {
+    // debugger;
+    this.drawAxes();
+  }
+
+  drawAxes() {
+    // x-axis
+    
+
+    // y-axis
+    this.ctx.beginPath();
+    this.ctx.moveTo(10, 0);
+    this.ctx.lineTo(10, this.canvasSize.y);
+    this.ctx.strokeStyle = '#ffffff';
+    this.ctx.lineWidth = 3;
+    this.ctx.stroke();
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
 
 
 
