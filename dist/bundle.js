@@ -298,6 +298,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
       camoflage: document.getElementById("prey-camoflage"),
       capacity: document.getElementById("prey-capacity"),
       reproduction: document.getElementById("prey-reproduction")
+    },
+    controls: {
+      play: document.getElementById("play-button"),
+      pause: document.getElementById("pause-button"),
+      restart: document.getElementById("restart-button")
     }
   };
   const simulationParams = new __WEBPACK_IMPORTED_MODULE_0__simulation_params__["a" /* default */];
@@ -405,6 +410,7 @@ class Simulation {
   constructor(canvas, graphCanvas, simulationParams) {
     this.simulationParams = simulationParams;
     this.canvas = canvas;
+    this.graphCanvas = graphCanvas;
     this.graph = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */](graphCanvas, simulationParams);
     this.panorama = new __WEBPACK_IMPORTED_MODULE_0__panorama__["a" /* default */](this.canvas);
     this.zoo = new __WEBPACK_IMPORTED_MODULE_1__zoo__["a" /* default */](this.simulationParams.predatorsParams(),
@@ -423,12 +429,33 @@ class Simulation {
     }, 42); //42 mHz = 24 fps
   }
 
+  togglePlaying(bool) {
+    if (bool) {
+      this.begin();
+    } else {
+      clearInterval(this.ticker);
+    }
+  }
+
   updateOrganisms(newParams) {
     this.zoo.updateOrganisms(newParams);
+    this.graph.updateOrganisms(newParams.preysParams);
   }
 
   updatePreysField(newParams) {
     this.zoo.updatePreysField(newParams);
+  }
+
+  restart() {
+    clearInterval(this.ticker);
+    this.graph = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */](this.graphCanvas, this.simulationParams);
+    this.panorama = new __WEBPACK_IMPORTED_MODULE_0__panorama__["a" /* default */](this.canvas);
+    this.zoo = new __WEBPACK_IMPORTED_MODULE_1__zoo__["a" /* default */](this.simulationParams.predatorsParams(),
+                       this.simulationParams.preysParams(),
+                       this.simulationParams.predatorFieldParams(),
+                       this.simulationParams.preyFieldParams(),
+                       this.panorama.panoramaSize);
+    this.begin();
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Simulation;
@@ -1098,6 +1125,10 @@ class Graph {
     this.ctx.lineTo(1, this.canvasSize.y);
     this.ctx.stroke();
   }
+
+  updateOrganisms({carryingCapacity}) {
+    this.carryingCapacity = carryingCapacity;
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
 
@@ -1115,11 +1146,13 @@ class Sliders {
     this.simulation = simulation;
     this.simulationParams = simulationParams;
     this.initializeEventListeners(sliderEls);
+    this.isPlaying = true;
   }
 
-  initializeEventListeners({predatorsSliders, preysSliders}) {
+  initializeEventListeners({predatorsSliders, preysSliders, controls}) {
     this.initializePredatorsEventListeners(predatorsSliders);
     this.initializePreysEventListeners(preysSliders);
+    this.initializeControlsEventListeners(controls);
   }
 
   initializePredatorsEventListeners(predatorsSliders) {
@@ -1166,6 +1199,18 @@ class Sliders {
     });
   }
 
+  initializeControlsEventListeners(controls) {
+    controls.play.addEventListener('click', e => {
+      this.togglePlaying('play');
+    });
+    controls.pause.addEventListener('click', e => {
+      this.togglePlaying('pause');
+    });
+    controls.restart.addEventListener('click', e => {
+      this.togglePlaying('restart');
+    });
+  }
+
   updateOrganisms() {
     this.simulation.updateOrganisms({
       predatorsParams: this.simulationParams.predatorsParams(),
@@ -1175,6 +1220,25 @@ class Sliders {
 
   updatePreysField() {
     this.simulation.updatePreysField(this.simulationParams.preyFieldParams());
+  }
+
+  togglePlaying(type) {
+    switch (type) {
+      case 'play':
+        if (!this.isPlaying) {
+          this.isPlaying = true;
+          this.simulation.togglePlaying(true);
+        }
+        break;
+      case 'pause':
+        this.isPlaying = false;
+        this.simulation.togglePlaying(false);
+        break;
+      case 'restart':
+        this.isPlaying = true;
+        this.simulation.restart();
+        break;
+    }
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Sliders;

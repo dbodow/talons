@@ -5,11 +5,13 @@ export default class Sliders {
     this.simulation = simulation;
     this.simulationParams = simulationParams;
     this.initializeEventListeners(sliderEls);
+    this.isPlaying = true;
   }
 
-  initializeEventListeners({predatorsSliders, preysSliders}) {
+  initializeEventListeners({predatorsSliders, preysSliders, controls}) {
     this.initializePredatorsEventListeners(predatorsSliders);
     this.initializePreysEventListeners(preysSliders);
+    this.initializeControlsEventListeners(controls);
   }
 
   initializePredatorsEventListeners(predatorsSliders) {
@@ -56,6 +58,18 @@ export default class Sliders {
     });
   }
 
+  initializeControlsEventListeners(controls) {
+    controls.play.addEventListener('click', e => {
+      this.togglePlaying('play');
+    });
+    controls.pause.addEventListener('click', e => {
+      this.togglePlaying('pause');
+    });
+    controls.restart.addEventListener('click', e => {
+      this.togglePlaying('restart');
+    });
+  }
+
   updateOrganisms() {
     this.simulation.updateOrganisms({
       predatorsParams: this.simulationParams.predatorsParams(),
@@ -65,5 +79,24 @@ export default class Sliders {
 
   updatePreysField() {
     this.simulation.updatePreysField(this.simulationParams.preyFieldParams());
+  }
+
+  togglePlaying(type) {
+    switch (type) {
+      case 'play':
+        if (!this.isPlaying) {
+          this.isPlaying = true;
+          this.simulation.togglePlaying(true);
+        }
+        break;
+      case 'pause':
+        this.isPlaying = false;
+        this.simulation.togglePlaying(false);
+        break;
+      case 'restart':
+        this.isPlaying = true;
+        this.simulation.restart();
+        break;
+    }
   }
 }

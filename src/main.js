@@ -23,6 +23,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
       camoflage: document.getElementById("prey-camoflage"),
       capacity: document.getElementById("prey-capacity"),
       reproduction: document.getElementById("prey-reproduction")
+    },
+    controls: {
+      play: document.getElementById("play-button"),
+      pause: document.getElementById("pause-button"),
+      restart: document.getElementById("restart-button")
     }
   };
   const simulationParams = new SimulationParams;

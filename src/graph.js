@@ -98,4 +98,8 @@ export default class Graph {
     this.ctx.lineTo(1, this.canvasSize.y);
     this.ctx.stroke();
   }
+
+  updateOrganisms({carryingCapacity}) {
+    this.carryingCapacity = carryingCapacity;
+  }
 }

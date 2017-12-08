@@ -1,5 +1,15 @@
 # Talons: A predator-prey dynamics simulator
 
+## Table of Contents
+  * [Background and Overview](#background-and-overview)
+  * [Setting Parameters](#setting-parameters)
+  * [Frontend](#frontend)
+    * Panoramic Scrolling
+    * Population Graphing
+  * [Backend](#backend)
+    * Physics Simulation
+    * Object-Oriented Practices
+
 ## Background and Overview
 Predator-prey dynamics is a [complex area of study](https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations) in ecosystems biology. However, [existing tools](https://www.google.com/search?channel=fs&q=predator+prey+simulation&ie=utf-8&oe=utf-8) for simulating these phenomena tend to be [highly abstract](http://www.phschool.com/atschool/phbio/active_art/predator_prey_simulation/) or [outdated and visually unappealing](http://www.shodor.org/interactivate/activities/RabbitsAndWolves/). Furthermore, these models endogenize important fitness factors in determining reproduction and survivorship into black-box categories such as 'predator effectiveness' or 'prey birthrate'.  
 
@@ -7,78 +17,31 @@ Predator-prey dynamics is a [complex area of study](https://en.wikipedia.org/wik
 
 Predators will move towards prey based on an inverse-square distance relationship. Prey will run from predators based on a similar inverse-square distance relationship.
 
-## Functionality and MVP
+## Setting Parameters
 
-### At Launch
-Users will be able to:
-* Set values for predator and prey fitness, including:
-  * Predators:
-    * Movement Speed
-    * Energy Efficiency (duration the predator survives without feeding)
-    * Longevity (duration the predator lives before dying of natural causes)
-  * Prey:
-    * Movement Speed
-    * Camouflage (a linear weight reducing the 'gravitation' of predators)
-    * Toxins (a small probability chance to kill a predator when attacked)
-    * Nest size (number of children per reproductive period)
+Users can specify parameters that determine predators' and prey's fitness levels by moving sliders below the panorama. By controlling the relative fitness of predators and prey, users can examine different ecosystem dynamics. For example, launching simulations with highly fit predators and overly-numerous prey tends to spike and then crash predator populations, while balancing relative fitness tends toward a more stable state.
 
-* Seed the simulation with new predators or prey with custom fitness values
-* View a predation simulation on a panoramic scrolling background
-* View a graph charting predator and prey populations on the same axes
+Parameters adjust fitness as follows:
+* Predators
+  * Speed: faster movement allows predators to more easily catch prey
+  * Perception: higher perception favors chasing prey over continuing momentum in a single direction when updating predators' movement vectors
+  * Efficiency: higher efficiency increases the time predators can survive without eating before starvation
+  * Reproduction Time: faster reproduction allows the predator population to grow at a faster rate
 
-### Priority Enhancements
+* Prey
+  * Speed: faster movement allows prey to run more quickly from nearby predators
+  * Camouflage: reduces each prey's 'gravitational field' strength in physics modeling, impeding predators ability to detect and react to prey movement
+  * Ecosystem Capacity: sets a maximum limit on prey populations before mass starvation
+  * Reproduction Time: faster reproduction allows the prey population to grow at a faster rate
 
-* Predators and prey will not be represented by simple shapes, but rather by distinct animated sprites
-* Incorporate ambient music
-* Incorporate action sound
+## Frontend
 
-### Stretch Enhancements
+### Panoramic scrolling
 
-* Write unit tests
-* Two player mode with asymmetric predator v.s. prey gameplay
+### Population Graphing
 
-## Wireframes
-![Talons Layout](./Talons-Mockup.jpg)
+## Backend
 
-## Architecture and Technologies
+### Physics Simulation
 
-* Vanilla JS for scripting
-* HTML5 Canvas for implementing simulation panorama
-* Webpack for bundling
-* Maybe Chart.js, though I'm interested in implementing my own charts if time allows
-* If time, I'd like to learn CSS Grid for layouts
-
-File Hierarchy:
-
-`index.html`  
-`main.js`  
-| `simulation`  
---| `panorama.js`  
---| `organism.js`  
---| `predator.js`  
---| `prey.js`  
-| `controls.js`  
-| `charts.js`  
-
-## Implementation Timeline
-
-I will take a "learn as you go" approach to HTML canvas.
-
-**Weekend**
-* Envision project
-* Build scrolling panorama  
-
-**Monday**
-* Develop organisms, predators, and prey with basic gravitation / Movement
-
-**Tuesday**
-* Develop/balance parameters for organisms
-
-**Wednesday**
-* Develop game controls
-* Create and begin styling UI for setting parameters
-
-**Thursday**
-* Implement charts
-* Polish CSS and bug squash
-* If ahead of schedule: Implement priority enhancements
+### Object Oriented Practices
