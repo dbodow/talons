@@ -14,7 +14,7 @@
           <h2>An visual ecosystem simulation.</h2>
         </div>
         <div class="header-links">
-          <div class="">
+          <div class="icons-container">
             <a href="https://www.linkedin.com/in/david-bodow-46375053/">
               <i class="fa fa-linkedin-square fa-4x" aria-hidden="true"></i>
             </a>
@@ -22,7 +22,7 @@
               <i class="fa fa-github-square fa-4x" aria-hidden="true"></i>
             </a>
           </div>
-          <h5>Project by David Bodow.</h5>
+          <h5>Vanilla JavaScript project by <b>David Bodow</b></h5>
         </div>
       </header>
       <canvas id="graph" width="1000" height="100" class="graph"></canvas>
@@ -34,19 +34,19 @@
       <div class="sliders-container">
         <div class="predator sliders">
           <h4>Owls</h4>
-          Starting Number<input type="range" min="1" max="100" value="50" class="slider" id="predator-count">
-          Speed<input type="range" min="1" max="100" value="50" class="slider" id="predator-speed">
-          Perception<input type="range" min="1" max="100" value="50" class="slider" id="predator-perception">
-          Efficiency<input type="range" min="1" max="100" value="50" class="slider" id="predator-efficiency">
-          Reproduction Time<input type="range" min="1" max="100" value="50" class="slider" id="predator-reproduction">
+          Starting Number<input type="range" min="0" max="50" value="20" class="slider" id="predator-count">
+          Speed<input type="range" min="10" max="25" value="15" class="slider" id="predator-speed">
+          Perception<input type="range" min="-10" max="10" value="0" class="slider" id="predator-perception">
+          Efficiency<input type="range" min="1000" max="20000" value="10000" class="slider" id="predator-efficiency">
+          Reproduction Time<input type="range" min="7000" max="30000" value="10000" class="slider" id="predator-reproduction">
         </div>
         <div class="prey sliders">
           <h4>Fireflies</h4>
-          Starting Number<input type="range" min="1" max="100" value="50" class="slider" id="prey-count">
-          Speed<input type="range" min="1" max="100" value="50" class="slider" id="prey-speed">
-          Camoflage<input type="range" min="1" max="100" value="50" class="slider" id="prey-camoflage">
-          Ecosystem Capacity<input type="range" min="1" max="100" value="50" class="slider" id="prey-capacity">
-          Reproduction Time<input type="range" min="1" max="100" value="50" class="slider" id="prey-reproduction">
+          Starting Number<input type="range" min="1" max="200" value="50" class="slider" id="prey-count">
+          Speed<input type="range" min="5" max="20" value="10" class="slider" id="prey-speed">
+          Camoflage<input type="range" min="30" max="70" value="50" class="slider" id="prey-camoflage">
+          Ecosystem Capacity<input type="range" min="10" max="300" value="200" class="slider" id="prey-capacity">
+          Reproduction Time<input type="range" min="2000" max="10000" value="30000" class="slider" id="prey-reproduction">
         </div>
       </div>
       <a class="citation" href="https://www.freepik.com/free-photos-vectors/background">Background image courtesy of Kjpargeter - Freepik.com</a>

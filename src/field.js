@@ -86,9 +86,13 @@ export default class Field {
         const sgnY = (row > y) ? 1 : -1 ;
         gradient.x += this.field[row][modCol] * cos * weight * sgnX;
         gradient.y += this.field[row][modCol] * sin * weight * sgnY;
-        if (isNaN(gradient.x) || isNaN(gradient.y)) debugger;
       }
     }
     return gradient;
+  }
+
+  updateFieldParams({fieldNetSize, gravitationNbhd}) {
+    this.fieldNetSize = fieldNetSize;
+    this.gravitationNbhd = gravitationNbhd;
   }
 }

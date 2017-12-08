@@ -9,6 +9,12 @@ export default class Predator extends Organism {
     this.efficiency = predatorParams.efficiency;
   }
 
+  updatePredatorParams({speed, efficiency, perception}) {
+    this.speed = speed;
+    this.efficiency = efficiency;
+    this.perception = perception; 
+  }
+
   feed(preys) {
     this.lastAte = Date.now();
   }

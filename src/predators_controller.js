@@ -57,4 +57,12 @@ export default class PredatorsController extends OrganismsController {
       this.lastReproduced = Date.now();
     }
   }
+
+  updatePredatorsParams({predatorParams, reproductionPeriod}) {
+    this.predatorParams = predatorParams;
+    this.reproductionPeriod = reproductionPeriod;
+    this.organisms.forEach( predator => {
+      predator.updatePredatorParams(predatorParams);
+    });
+  }
 }

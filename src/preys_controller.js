@@ -51,4 +51,14 @@ export default class PreysController extends OrganismsController {
       this.organisms = this.organisms.slice(middleIdx);
     }
   }
+
+  updatePreysParams({preyParams, reproductionPeriod, carryingCapacity}) {
+    this.preyParams = preyParams;
+    this.reproductionPeriod = reproductionPeriod;
+    this.carryingCapacity = carryingCapacity;
+    console.log(this.reproductionPeriod);
+    this.organisms.forEach( prey => {
+      prey.updatePreyParams(preyParams);
+    });
+  }
 }

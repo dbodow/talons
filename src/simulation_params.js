@@ -17,9 +17,10 @@ export default class SimulationParams {
     this.preyCount = 50;
     this.preySpeed = 10;
     this.preyRadius = 10;
-    this.preyGravitationNbhd = 10;
+    this.preyGravitationNbhd = 20;
     this.preyColor = '#efe092';
     this.preyPerception = 7; // lower is better; this is a 1/x weight
+    this.preyCamoflage = 0.5;
     this.preyReproductionPeriod = 10000; // should be longer than efficiency
     this.preyCarryingCapacity = 200;
     this.fieldNetSize = 10; // Must be smaller than radius/sqrt(2)!
@@ -48,7 +49,7 @@ export default class SimulationParams {
         color: this.preyColor,
         perception: this.preyPerception
       },
-      reproductionPeriod: this.predatorReproductionPeriod,
+      reproductionPeriod: this.preyReproductionPeriod,
       carryingCapacity: this.preyCarryingCapacity
     };
   }
@@ -63,7 +64,7 @@ export default class SimulationParams {
   preyFieldParams() {
     return {
       fieldNetSize: this.fieldNetSize,
-      gravitationNbhd: this.preyGravitationNbhd
+      gravitationNbhd: Math.round(this.preyGravitationNbhd * this.preyCamoflage)
     };
   }
 }

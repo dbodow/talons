@@ -25,4 +25,12 @@ export default class Simulation {
       this.graph.draw(this.zoo);
     }, 42); //42 mHz = 24 fps
   }
+
+  updateOrganisms(newParams) {
+    this.zoo.updateOrganisms(newParams);
+  }
+
+  updatePreysField(newParams) {
+    this.zoo.updatePreysField(newParams);
+  }
 }

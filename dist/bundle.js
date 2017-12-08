@@ -272,6 +272,8 @@ class OrganismsController {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__simulation_params__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__simulation__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__sliders__ = __webpack_require__(15);
+
 
 
 
@@ -282,8 +284,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 document.addEventListener("DOMContentLoaded", function(event) {
   const canvas = document.getElementById("canvas");
   const graph = document.getElementById("graph");
+  const sliderEls = {
+    predatorsSliders: {
+      count: document.getElementById("predator-count"),
+      speed: document.getElementById("predator-speed"),
+      perception: document.getElementById("predator-perception"),
+      efficiency: document.getElementById("predator-efficiency"),
+      reproduction: document.getElementById("predator-reproduction")
+    },
+    preysSliders: {
+      count: document.getElementById("prey-count"),
+      speed: document.getElementById("prey-speed"),
+      camoflage: document.getElementById("prey-camoflage"),
+      capacity: document.getElementById("prey-capacity"),
+      reproduction: document.getElementById("prey-reproduction")
+    }
+  };
   const simulationParams = new __WEBPACK_IMPORTED_MODULE_0__simulation_params__["a" /* default */];
   const simulation = new __WEBPACK_IMPORTED_MODULE_1__simulation__["a" /* default */](canvas, graph, simulationParams);
+  const sliders = new __WEBPACK_IMPORTED_MODULE_2__sliders__["a" /* default */](sliderEls, simulation, simulationParams);
   // simulation.loadAssets(); // fetch images from server for user in canvas
   simulation.begin();
 });
@@ -313,9 +332,10 @@ class SimulationParams {
     this.preyCount = 50;
     this.preySpeed = 10;
     this.preyRadius = 10;
-    this.preyGravitationNbhd = 10;
+    this.preyGravitationNbhd = 20;
     this.preyColor = '#efe092';
     this.preyPerception = 7; // lower is better; this is a 1/x weight
+    this.preyCamoflage = 0.5;
     this.preyReproductionPeriod = 10000; // should be longer than efficiency
     this.preyCarryingCapacity = 200;
     this.fieldNetSize = 10; // Must be smaller than radius/sqrt(2)!
@@ -344,7 +364,7 @@ class SimulationParams {
         color: this.preyColor,
         perception: this.preyPerception
       },
-      reproductionPeriod: this.predatorReproductionPeriod,
+      reproductionPeriod: this.preyReproductionPeriod,
       carryingCapacity: this.preyCarryingCapacity
     };
   }
@@ -359,7 +379,7 @@ class SimulationParams {
   preyFieldParams() {
     return {
       fieldNetSize: this.fieldNetSize,
-      gravitationNbhd: this.preyGravitationNbhd
+      gravitationNbhd: Math.round(this.preyGravitationNbhd * this.preyCamoflage)
     };
   }
 }
@@ -401,6 +421,14 @@ class Simulation {
       this.panorama.draw(this.zoo);
       this.graph.draw(this.zoo);
     }, 42); //42 mHz = 24 fps
+  }
+
+  updateOrganisms(newParams) {
+    this.zoo.updateOrganisms(newParams);
+  }
+
+  updatePreysField(newParams) {
+    this.zoo.updatePreysField(newParams);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Simulation;
@@ -576,6 +604,15 @@ class Zoo {
     this.preysField = new __WEBPACK_IMPORTED_MODULE_2__field__["a" /* default */](preyFieldParams, panoramaSize, 1);
   }
 
+  updateOrganisms({predatorsParams, preysParams}) {
+    this.predatorsController.updatePredatorsParams(predatorsParams);
+    this.preysController.updatePreysParams(preysParams);
+  }
+
+  updatePreysField(preyFieldParams) {
+    this.preysField.updateFieldParams(preyFieldParams);
+  }
+
   tick() {
     this.feed();
     this.starve();
@@ -705,6 +742,14 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
       this.lastReproduced = Date.now();
     }
   }
+
+  updatePredatorsParams({predatorParams, reproductionPeriod}) {
+    this.predatorParams = predatorParams;
+    this.reproductionPeriod = reproductionPeriod;
+    this.organisms.forEach( predator => {
+      predator.updatePredatorParams(predatorParams);
+    });
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PredatorsController;
 
@@ -725,6 +770,12 @@ class Predator extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */
     super(predatorParams, panoramaSize);
     this.lastAte = Date.now();
     this.efficiency = predatorParams.efficiency;
+  }
+
+  updatePredatorParams({speed, efficiency, perception}) {
+    this.speed = speed;
+    this.efficiency = efficiency;
+    this.perception = perception; 
   }
 
   feed(preys) {
@@ -796,6 +847,16 @@ class PreysController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller_
       this.organisms = this.organisms.slice(middleIdx);
     }
   }
+
+  updatePreysParams({preyParams, reproductionPeriod, carryingCapacity}) {
+    this.preyParams = preyParams;
+    this.reproductionPeriod = reproductionPeriod;
+    this.carryingCapacity = carryingCapacity;
+    console.log(this.reproductionPeriod);
+    this.organisms.forEach( prey => {
+      prey.updatePreyParams(preyParams);
+    });
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PreysController;
 
@@ -814,6 +875,10 @@ class PreysController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller_
 class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
   constructor(preyParams, panoramaSize) {
     super(preyParams, panoramaSize);
+  }
+
+  updatePreyParams({speed}) {
+    this.speed = speed;
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Prey;
@@ -913,10 +978,14 @@ class Field {
         const sgnY = (row > y) ? 1 : -1 ;
         gradient.x += this.field[row][modCol] * cos * weight * sgnX;
         gradient.y += this.field[row][modCol] * sin * weight * sgnY;
-        if (isNaN(gradient.x) || isNaN(gradient.y)) debugger;
       }
     }
     return gradient;
+  }
+
+  updateFieldParams({fieldNetSize, gravitationNbhd}) {
+    this.fieldNetSize = fieldNetSize;
+    this.gravitationNbhd = gravitationNbhd;
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Field;
@@ -1031,6 +1100,84 @@ class Graph {
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
+
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+
+class Sliders {
+  constructor(sliderEls, simulation, simulationParams) {
+    this.simulation = simulation;
+    this.simulationParams = simulationParams;
+    this.initializeEventListeners(sliderEls);
+  }
+
+  initializeEventListeners({predatorsSliders, preysSliders}) {
+    this.initializePredatorsEventListeners(predatorsSliders);
+    this.initializePreysEventListeners(preysSliders);
+  }
+
+  initializePredatorsEventListeners(predatorsSliders) {
+    predatorsSliders.count.addEventListener('mouseup', e => {
+      this.simulationParams.predatorCount = e.target.value;
+    });
+    predatorsSliders.speed.addEventListener('mouseup', e => {
+      this.simulationParams.predatorSpeed = e.target.value;
+      this.updateOrganisms();
+    });
+    predatorsSliders.perception.addEventListener('mouseup', e => {
+      this.simulationParams.predatorPerception = 25 - e.target.value;
+      this.updateOrganisms();
+    });
+    predatorsSliders.efficiency.addEventListener('mouseup', e => {
+      this.simulationParams.predatorEfficiency = e.target.value;
+      this.updateOrganisms();
+    });
+    predatorsSliders.reproduction.addEventListener('mouseup', e => {
+      this.simulationParams.predatorReproductionPeriod = e.target.value;
+      this.updateOrganisms();
+    });
+  }
+
+  initializePreysEventListeners(preysSliders) {
+    preysSliders.count.addEventListener('mouseup', e => {
+      this.simulationParams.preyCount = e.target.value;
+    });
+    preysSliders.speed.addEventListener('mouseup', e => {
+      this.simulationParams.preySpeed = e.target.value;
+      this.updateOrganisms();
+    });
+    preysSliders.camoflage.addEventListener('mouseup', e => {
+      this.simulationParams.preyCamoflage = e.target.value / 100;
+      this.updatePreysField();
+    });
+    preysSliders.capacity.addEventListener('mouseup', e => {
+      this.simulationParams.preyCarryingCapacity = e.target.value;
+      this.updateOrganisms();
+    });
+    preysSliders.reproduction.addEventListener('mouseup', e => {
+      this.simulationParams.preyReproductionPeriod = e.target.value;
+      this.updateOrganisms();
+    });
+  }
+
+  updateOrganisms() {
+    this.simulation.updateOrganisms({
+      predatorsParams: this.simulationParams.predatorsParams(),
+      preysParams: this.simulationParams.preysParams()
+    });
+  }
+
+  updatePreysField() {
+    this.simulation.updatePreysField(this.simulationParams.preyFieldParams());
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Sliders;
 
 
 

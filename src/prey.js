@@ -6,4 +6,8 @@ export default class Prey extends Organism {
   constructor(preyParams, panoramaSize) {
     super(preyParams, panoramaSize);
   }
+
+  updatePreyParams({speed}) {
+    this.speed = speed;
+  }
 }

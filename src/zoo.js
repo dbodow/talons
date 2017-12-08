@@ -14,6 +14,15 @@ export default class Zoo {
     this.preysField = new Field(preyFieldParams, panoramaSize, 1);
   }
 
+  updateOrganisms({predatorsParams, preysParams}) {
+    this.predatorsController.updatePredatorsParams(predatorsParams);
+    this.preysController.updatePreysParams(preysParams);
+  }
+
+  updatePreysField(preyFieldParams) {
+    this.preysField.updateFieldParams(preyFieldParams);
+  }
+
   tick() {
     this.feed();
     this.starve();
