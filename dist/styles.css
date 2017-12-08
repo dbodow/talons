@@ -1,5 +1,5 @@
 body {
-  background-image: url("http://s3-us-west-1.amazonaws.com/talons-dev/6496.jpg");
+  background-image: url("https://s3-us-west-1.amazonaws.com/talons-dev/6496.jpg");
   background-size: 100%;
   background-position: center;
   background-attachment: fixed;
@@ -30,6 +30,19 @@ h4 {
   font-weight: 400;
 }
 
+h5 {
+  font-weight: 300;
+  margin: 5px 0 0 0;
+}
+
+
+
+a, a:link, a:hover,
+a:active, a:visited {
+  color: #ffffff;
+  margin: 0 10px;
+}
+
 main {
   color: white;
   display: flex;
@@ -40,16 +53,31 @@ main {
   width: 100%
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-links {
+  align-self: center;
+}
+
 .citation, .citation:link, .citation:hover,
 .citation:active, .citation:visited {
-  color: #ffad16;
+  color: #ffffff;
   font-weight: 300;
   text-decoration: none;
   margin: 10px 0;
 }
 
+.graph {
+  width: 1000px;
+  height: 100px;
+  align-self: center;
+  margin: 10px 0;
+}
+
 .simulation {
-  right: 50%;
   width: 1000px;
   height: 750px;
   align-self: center;

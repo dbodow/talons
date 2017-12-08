@@ -44,4 +44,8 @@ export const getMousePos = (canvas, e) => {
     x: e.clientX - rect.left,
     y: e.clientY - rect.top
   };
-}
+};
+
+export const fitToAxis = (value, valueMax, axisMax) => (
+  (value / valueMax) * axisMax
+);

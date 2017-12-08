@@ -3,14 +3,29 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="./dist/styles.css">
-     <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,600,800" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,600,800" rel="stylesheet">
     <title>Talons</title>
   </head>
   <body>
     <main>
-      <h1>Talons</h1>
-      <h2>An visual ecosystem simulation.</h2>
-      <canvas id="graph" width="1000" height="100"></canvas>
+      <header class="header">
+        <div class="header-text">
+          <h1>Talons</h1>
+          <h2>An visual ecosystem simulation.</h2>
+        </div>
+        <div class="header-links">
+          <div class="">
+            <a href="https://www.linkedin.com/in/david-bodow-46375053/">
+              <i class="fa fa-linkedin-square fa-4x" aria-hidden="true"></i>
+            </a>
+            <a href="https://github.com/dbodow/talons">
+              <i class="fa fa-github-square fa-4x" aria-hidden="true"></i>
+            </a>
+          </div>
+          <h5>Project by David Bodow.</h5>
+        </div>
+      </header>
+      <canvas id="graph" width="1000" height="100" class="graph"></canvas>
       <canvas id="canvas" width="1000" height="750" class="simulation clear">
         Your browser does not support the HTML canvas tag.
         Please consider upgrading to a modern browser.
@@ -36,6 +51,7 @@
       </div>
       <a class="citation" href="https://www.freepik.com/free-photos-vectors/background">Background image courtesy of Kjpargeter - Freepik.com</a>
     </main>
-    <script src='./dist/bundle.js'></script>
   </body>
+  <script src='./dist/bundle.js'></script>
+  <script src="https://use.fontawesome.com/34b812209d.js"></script>
 </html>

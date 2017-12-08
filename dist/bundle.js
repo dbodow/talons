@@ -73,7 +73,7 @@
 const positiveMod = (n, m) => (
   ((n % m) + m) % m
 );
-/* harmony export (immutable) */ __webpack_exports__["g"] = positiveMod;
+/* harmony export (immutable) */ __webpack_exports__["h"] = positiveMod;
 
 
 // computed the horizontal distance between two points
@@ -116,7 +116,7 @@ const gravitation = dist => {
     return Math.pow(dist, -2);
   }
 };
-/* harmony export (immutable) */ __webpack_exports__["f"] = gravitation;
+/* harmony export (immutable) */ __webpack_exports__["g"] = gravitation;
 
 
 // inspired by https://stackoverflow.com/questions/1114465/getting-mouse-location-in-canvas
@@ -126,8 +126,14 @@ const getMousePos = (canvas, e) => {
     x: e.clientX - rect.left,
     y: e.clientY - rect.top
   };
-}
-/* harmony export (immutable) */ __webpack_exports__["e"] = getMousePos;
+};
+/* harmony export (immutable) */ __webpack_exports__["f"] = getMousePos;
+
+
+const fitToAxis = (value, valueMax, axisMax) => (
+  (value / valueMax) * axisMax
+);
+/* harmony export (immutable) */ __webpack_exports__["e"] = fitToAxis;
 
 
 
@@ -170,7 +176,7 @@ class Organism {
 
   moveOrganism({width, height}) {
     this.center = {
-      x: Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* positiveMod */])(this.center.x + this.dxdt(), width),
+      x: Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["h" /* positiveMod */])(this.center.x + this.dxdt(), width),
       y: this.center.y + this.dydt()
     };
     this.resolveBounces(height);
@@ -278,6 +284,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   const graph = document.getElementById("graph");
   const simulationParams = new __WEBPACK_IMPORTED_MODULE_0__simulation_params__["a" /* default */];
   const simulation = new __WEBPACK_IMPORTED_MODULE_1__simulation__["a" /* default */](canvas, graph, simulationParams);
+  // simulation.loadAssets(); // fetch images from server for user in canvas
   simulation.begin();
 });
 
@@ -376,9 +383,9 @@ class SimulationParams {
 
 class Simulation {
   constructor(canvas, graphCanvas, simulationParams) {
-    this.canvas = canvas;
-    this.graph = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */](graphCanvas);
     this.simulationParams = simulationParams;
+    this.canvas = canvas;
+    this.graph = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */](graphCanvas, simulationParams);
     this.panorama = new __WEBPACK_IMPORTED_MODULE_0__panorama__["a" /* default */](this.canvas);
     this.zoo = new __WEBPACK_IMPORTED_MODULE_1__zoo__["a" /* default */](this.simulationParams.predatorsParams(),
                        this.simulationParams.preysParams(),
@@ -428,6 +435,11 @@ class Panorama {
     this.setCanvasListeners(canvas);
   }
 
+  // loadAssets() {
+  //   let loaded = false;
+  //   this.background.
+  // }
+
   draw(zoo) {
     // this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
     this.background.draw(this.dx);
@@ -443,7 +455,7 @@ class Panorama {
 
   drawOrganism(organism) {
     this.ctx.beginPath();
-    this.ctx.arc(Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["g" /* positiveMod */])(organism.center.x - this.dx, this.panoramaSize.width),
+    this.ctx.arc(Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["h" /* positiveMod */])(organism.center.x - this.dx, this.panoramaSize.width),
                  organism.center.y, organism.radius, 0, 2 * Math.PI);
     this.ctx.fillStyle = organism.color;
     this.ctx.strokeStyle = '#476189';
@@ -455,7 +467,7 @@ class Panorama {
   updateDx() {
     this.dampenStaleCursorInput();
     this.dx += this.cursorOffsetX * 0.075;
-    this.dx = Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["g" /* positiveMod */])(this.dx, this.panoramaSize.width);
+    this.dx = Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["h" /* positiveMod */])(this.dx, this.panoramaSize.width);
   }
 
   toggleDampening(bool) {
@@ -482,7 +494,7 @@ class Panorama {
 
   setCanvasListeners(canvas) {
     canvas.addEventListener('mousemove', e => {
-      const mousePos = Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["e" /* getMousePos */])(canvas, e);
+      const mousePos = Object(__WEBPACK_IMPORTED_MODULE_1__util_util__["f" /* getMousePos */])(canvas, e);
       this.updateCursorOffset(mousePos);
     });
 
@@ -513,6 +525,7 @@ class Background {
     this.ctx = canvas.getContext('2d');
     this.img = new Image;
     this.img.src = backgroundPath;
+    this.loaded = false;
     this.imageSize = {
       width: this.img.width,
       height: this.img.height
@@ -864,9 +877,9 @@ class Field {
         let modCol = col;
         if (row < 0 || row >= this.fieldSize.rowCount) continue;
         if (modCol < 0 || modCol >= this.fieldSize.colCount) {
-          modCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* positiveMod */])(modCol, Math.floor(this.fieldSize.colCount));
+          modCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["h" /* positiveMod */])(modCol, Math.floor(this.fieldSize.colCount));
         }
-        const pointVector = this.sgn * Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* gravitation */])(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* distance */])(x, y, modCol, row, this.fieldSize.colCount));
+        const pointVector = this.sgn * Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* gravitation */])(Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* distance */])(x, y, modCol, row, this.fieldSize.colCount));
         this.field[row][modCol] += pointVector;
       }
     }
@@ -889,9 +902,9 @@ class Field {
         let modCol = col;
         if (row < 0 || row >= this.fieldSize.rowCount) continue;
         if (col === x || row === y) continue;
-        modCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* positiveMod */])(modCol, this.fieldSize.colCount);
+        modCol = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["h" /* positiveMod */])(modCol, this.fieldSize.colCount);
         const dist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["a" /* distance */])(col, row, x, y, this.fieldSize.colCount);
-        const weight = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["f" /* gravitation */])(dist);
+        const weight = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["g" /* gravitation */])(dist);
         const xDist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["b" /* distanceX */])(x, modCol, this.fieldSize.rowCount);
         const yDist = Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["c" /* distanceY */])(y, row);
         const sin = yDist / dist;
@@ -915,31 +928,105 @@ class Field {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_util__ = __webpack_require__(0);
+
+
 class Graph {
-  constructor(graphCanvas) {
+  constructor(graphCanvas, simulationParams) {
     this.graphCanvas = graphCanvas;
     this.canvasSize = {
       x: graphCanvas.width,
       y: graphCanvas.height
     };
     this.ctx = graphCanvas.getContext('2d');
+    this.carryingCapacity = simulationParams.preyCarryingCapacity;
+    this.lastCoords = [{
+      predatorsCount: simulationParams.predatorCount,
+      preysCount: simulationParams.preyCount
+    }];
+    this.lastDraw = Date.now();
+    this.predatorColor = simulationParams.predatorColor;
+    this.preyColor = simulationParams.preyColor;
   }
 
   draw(zoo) {
-    // debugger;
-    this.drawAxes();
+    if (Date.now() - this.lastDraw > 1000) {
+      this.updateDatapoints(zoo);
+      this.ctx.clearRect(0, 0, this.canvasSize.x, this.canvasSize.y);
+      this.drawData();
+      this.drawAxes();
+      this.lastDraw = Date.now();
+    }
+  }
+
+  updateDatapoints(zoo) {
+    const predatorsCount = zoo.predatorsController.organisms.length;
+    const preysCount = zoo.preysController.organisms.length;
+    this.lastCoords.push({
+      predatorsCount,
+      preysCount
+    });
+    if (this.lastCoords.length > 100) {
+      this.lastCoords = this.lastCoords.slice(1);
+    }
+  }
+
+  drawData() {
+    this.drawPredatorData();
+    this.drawPreyData();
+  }
+
+  drawPredatorData() {
+    const xIncrement = Math.floor(this.canvasSize.x / 100);
+    let xCoord = 0;
+    this.ctx.strokeStyle = this.predatorColor;
+    this.ctx.lineWidth = 2;
+    this.ctx.beginPath();
+    this.ctx.moveTo(xCoord,
+      this.canvasSize.y - Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["e" /* fitToAxis */])(this.lastCoords[0].predatorsCount,
+        this.carryingCapacity, this.canvasSize.y));
+    xCoord += xIncrement;
+    this.lastCoords.slice(1).forEach((coord, idx) => {
+      this.ctx.lineTo(xCoord, this.canvasSize.y - Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["e" /* fitToAxis */])(coord.predatorsCount,
+          this.carryingCapacity, this.canvasSize.y));
+      this.ctx.stroke();
+      xCoord += xIncrement;
+    });
+  }
+
+  drawPreyData() {
+    const xIncrement = Math.floor(this.canvasSize.x / 100);
+    let xCoord = 0;
+    this.ctx.strokeStyle = this.preyColor;
+    this.ctx.lineWidth = 2;
+    this.ctx.beginPath();
+    this.ctx.moveTo(xCoord,
+      this.canvasSize.y - Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["e" /* fitToAxis */])(this.lastCoords[0].preysCount,
+        this.carryingCapacity, this.canvasSize.y));
+        // debugger;
+    xCoord += xIncrement;
+    this.lastCoords.slice(1).forEach((coord, idx) => {
+      this.ctx.lineTo(xCoord, this.canvasSize.y - Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["e" /* fitToAxis */])(coord.preysCount,
+          this.carryingCapacity, this.canvasSize.y));
+      this.ctx.stroke();
+      xCoord += xIncrement;
+    });
   }
 
   drawAxes() {
+    this.ctx.strokeStyle = '#ffffff';
+    this.ctx.lineWidth = 2;
+
     // x-axis
-    
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, this.canvasSize.y-1);
+    this.ctx.lineTo(this.canvasSize.x, this.canvasSize.y-1);
+    this.ctx.stroke();
 
     // y-axis
     this.ctx.beginPath();
-    this.ctx.moveTo(10, 0);
-    this.ctx.lineTo(10, this.canvasSize.y);
-    this.ctx.strokeStyle = '#ffffff';
-    this.ctx.lineWidth = 3;
+    this.ctx.moveTo(1, 0);
+    this.ctx.lineTo(1, this.canvasSize.y);
     this.ctx.stroke();
   }
 }

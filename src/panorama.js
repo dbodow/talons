@@ -19,6 +19,11 @@ export default class Panorama {
     this.setCanvasListeners(canvas);
   }
 
+  // loadAssets() {
+  //   let loaded = false;
+  //   this.background.
+  // }
+
   draw(zoo) {
     // this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
     this.background.draw(this.dx);

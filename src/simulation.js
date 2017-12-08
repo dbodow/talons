@@ -6,9 +6,9 @@ import Graph from './graph';
 
 export default class Simulation {
   constructor(canvas, graphCanvas, simulationParams) {
-    this.canvas = canvas;
-    this.graph = new Graph(graphCanvas);
     this.simulationParams = simulationParams;
+    this.canvas = canvas;
+    this.graph = new Graph(graphCanvas, simulationParams);
     this.panorama = new Panorama(this.canvas);
     this.zoo = new Zoo(this.simulationParams.predatorsParams(),
                        this.simulationParams.preysParams(),

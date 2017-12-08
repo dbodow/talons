@@ -9,6 +9,7 @@ export default class Background {
     this.ctx = canvas.getContext('2d');
     this.img = new Image;
     this.img.src = backgroundPath;
+    this.loaded = false;
     this.imageSize = {
       width: this.img.width,
       height: this.img.height
