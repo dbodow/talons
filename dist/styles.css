@@ -139,8 +139,8 @@ main {
   appearance: none;
   width: 90%;
   height: 25px;
-  background-color: none;
-  background-image: linear-gradient(to bottom, hsla(217, 51%, 28%, 0), hsla(217, 51%, 28%, 1) 50%, hsla(217, 51%, 28%, 0) 100%); /* Grey background */
+  background-color: transparent;
+  background-image: linear-gradient(to bottom, rgba(235, 235, 235, 0), rgba(235, 235, 235, 0) 40%, rgba(235, 235, 235, 1) 50%, rgba(235, 235, 235, 0) 60%, rgba(235, 235, 235, 0) 100%);
   outline: none;
   opacity: 0.7;
   -webkit-transition: .2s;
@@ -157,26 +157,32 @@ main {
     width: 25px;
     height: 25px;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .slider::-moz-range-thumb {
     width: 25px;
     height: 25px;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .predator > .slider::-webkit-slider-thumb {
   background-color: #354b6d;
+  border: 2px solid #efe092;
 }
 
 .predator > .slider::-moz-range-thumb {
   background-color: #354b6d;
+  border: 2px solid #efe092;
 }
 
 .prey > .slider::-webkit-slider-thumb {
   background-color: #efe092;
+  border: 2px solid #354b6d;
 }
 
 .prey > .slider::-moz-range-thumb {
   background-color: #efe092;
+  border: 2px solid #354b6d;
 }

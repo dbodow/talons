@@ -25,10 +25,11 @@ export default class Panorama {
   // }
 
   draw(zoo) {
-    // this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
-    this.background.draw(this.dx);
-    this.drawOrganisms(zoo.preysController);
-    this.drawOrganisms(zoo.predatorsController);
+    if (this.background.loaded) {
+      this.background.draw(this.dx);
+      this.drawOrganisms(zoo.preysController);
+      this.drawOrganisms(zoo.predatorsController);
+    }
   }
 
   drawOrganisms(controller) {
