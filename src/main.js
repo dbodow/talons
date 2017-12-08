@@ -7,7 +7,8 @@ import Simulation from './simulation';
 
 document.addEventListener("DOMContentLoaded", function(event) {
   const canvas = document.getElementById("canvas");
+  const graph = document.getElementById("graph");
   const simulationParams = new SimulationParams;
-  const simulation = new Simulation(canvas, simulationParams);
+  const simulation = new Simulation(canvas, graph, simulationParams);
   simulation.begin();
 });

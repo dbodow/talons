@@ -6,19 +6,22 @@
 export default class SimulationParams {
   constructor() {
     //set defaults
-    this.predatorCount = 10;
+    this.predatorCount = 20;
     this.predatorSpeed = 15;
     this.predatorRadius = 40;
     this.predatorGravitationNbhd = 10;
-    this.predatorColor = '#bc482b';
-    this.predatorEfficiency = 2000000;
+    this.predatorColor = '#354b6d';
+    this.predatorEfficiency = 10000;
     this.predatorPerception = 25; // lower is better; this is a 1/x weight
-    this.preyCount = 20;
+    this.predatorReproductionPeriod = 12000; // should be longer than efficiency
+    this.preyCount = 50;
     this.preySpeed = 10;
-    this.preyRadius = 20;
+    this.preyRadius = 10;
     this.preyGravitationNbhd = 10;
-    this.preyColor = '#4c6ea5';
+    this.preyColor = '#efe092';
     this.preyPerception = 7; // lower is better; this is a 1/x weight
+    this.preyReproductionPeriod = 10000; // should be longer than efficiency
+    this.preyCarryingCapacity = 200;
     this.fieldNetSize = 10; // Must be smaller than radius/sqrt(2)!
   }
 
@@ -31,7 +34,8 @@ export default class SimulationParams {
         color: this.predatorColor,
         efficiency: this.predatorEfficiency,
         perception: this.predatorPerception
-      }
+      },
+      reproductionPeriod: this.predatorReproductionPeriod
     };
   }
 
@@ -43,7 +47,9 @@ export default class SimulationParams {
         radius: this.preyRadius,
         color: this.preyColor,
         perception: this.preyPerception
-      }
+      },
+      reproductionPeriod: this.predatorReproductionPeriod,
+      carryingCapacity: this.preyCarryingCapacity
     };
   }
 

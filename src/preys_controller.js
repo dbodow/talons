@@ -5,9 +5,12 @@ import OrganismsController from './organisms_controller';
 import { fieldCellCoords } from '../util/util';
 
 export default class PreysController extends OrganismsController {
-  constructor(preysParams, panoramaSize) {
-    super();
-    this.populatePreys(preysParams, panoramaSize);
+  constructor({preyParams, count, reproductionPeriod, carryingCapacity},
+              panoramaSize) {
+    super(reproductionPeriod);
+    this.preyParams = preyParams;
+    this.carryingCapacity = carryingCapacity;
+    this.populatePreys({count, preyParams}, panoramaSize);
   }
 
   populatePreys({count, preyParams}, panoramaSize) {
@@ -31,28 +34,21 @@ export default class PreysController extends OrganismsController {
     return locations;
   }
 
-  // initializeLocations() {
-  //   const rowCount = Math.ceil(this.panoramaHeight / this.fieldNetSize);
-  //   const colCount = Math.ceil(this.panoramaWidth / this.fieldNetSize);
-  //   this.locations = Array(rowCount).fill(0).map(el => (
-  //     Array(colCount)
-  //   ));
-  // }
-  //
-  // resetLocations() {
-  //   this.locations.forEach( row => {
-  //     row.map( entry => null );
-  //   });
-  // }
-  //
-  // updateLocations() {
-  //   // debugger;
-  //   this.resetLocations();
-  //   this.organisms.forEach( organism => {
-  //     if (organism.fieldPosition === undefined) debugger;
-  //     if (this.locations[organism.fieldPosition.y] === undefined ) debugger;
-  //     // if (this.locations[organism.fieldPosition.y][organism.fieldPosition.x] !== null) console.log(organism);
-  //     this.locations[organism.fieldPosition.y][organism.fieldPosition.x] = organism;
-  //   });
-  // }
+  reproducePreys(panoramaSize) {
+    if (Date.now() - this.lastReproduced > this.reproductionPeriod) {
+      const populateParams = {
+        count: this.organisms.length,
+        preyParams: this.preyParams
+      };
+      this.populatePreys(populateParams, panoramaSize);
+      this.lastReproduced = Date.now();
+    }
+  }
+
+  starvePreys() {
+    if (this.organisms.length > this.carryingCapacity) {
+      const middleIdx = Math.floor(this.organisms.length / 2);
+      this.organisms = this.organisms.slice(middleIdx);
+    }
+  }
 }

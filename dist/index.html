@@ -2,13 +2,40 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="./styles.css">
+     <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,600,800" rel="stylesheet">
     <title>Talons</title>
   </head>
   <body>
-    <canvas id="canvas" width="1000" height="1000">
-      Your browser does not support the HTML canvas tag.
-      Please consider upgrading to a modern browser.
-    </canvas>
+    <main>
+      <h1>Talons</h1>
+      <h2>An visual ecosystem simulation.</h2>
+      <canvas id="graph" width="1000" height="100"></canvas>
+      <canvas id="canvas" width="1000" height="750" class="simulation clear">
+        Your browser does not support the HTML canvas tag.
+        Please consider upgrading to a modern browser.
+      </canvas>
+      <h3>Adjust sliders to change the ecosystem.</h3>
+      <div class="sliders-container">
+        <div class="predator sliders">
+          <h4>Owls</h4>
+          Starting Number<input type="range" min="1" max="100" value="50" class="slider" id="predator-count">
+          Speed<input type="range" min="1" max="100" value="50" class="slider" id="predator-speed">
+          Perception<input type="range" min="1" max="100" value="50" class="slider" id="predator-perception">
+          Efficiency<input type="range" min="1" max="100" value="50" class="slider" id="predator-efficiency">
+          Reproduction Time<input type="range" min="1" max="100" value="50" class="slider" id="predator-reproduction">
+        </div>
+        <div class="prey sliders">
+          <h4>Fireflies</h4>
+          Starting Number<input type="range" min="1" max="100" value="50" class="slider" id="prey-count">
+          Speed<input type="range" min="1" max="100" value="50" class="slider" id="prey-speed">
+          Camoflage<input type="range" min="1" max="100" value="50" class="slider" id="prey-camoflage">
+          Ecosystem Capacity<input type="range" min="1" max="100" value="50" class="slider" id="prey-capacity">
+          Reproduction Time<input type="range" min="1" max="100" value="50" class="slider" id="prey-reproduction">
+        </div>
+      </div>
+      <a class="citation" href="https://www.freepik.com/free-photos-vectors/background">Background image courtesy of Kjpargeter - Freepik.com</a>
+    </main>
     <script src='bundle.js'></script>
   </body>
 </html>

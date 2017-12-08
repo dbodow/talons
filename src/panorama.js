@@ -20,7 +20,7 @@ export default class Panorama {
   }
 
   draw(zoo) {
-    this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+    // this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
     this.background.draw(this.dx);
     this.drawOrganisms(zoo.preysController);
     this.drawOrganisms(zoo.predatorsController);
@@ -37,7 +37,10 @@ export default class Panorama {
     this.ctx.arc(positiveMod(organism.center.x - this.dx, this.panoramaSize.width),
                  organism.center.y, organism.radius, 0, 2 * Math.PI);
     this.ctx.fillStyle = organism.color;
+    this.ctx.strokeStyle = '#476189';
     this.ctx.fill();
+    this.ctx.lineWidth = 5;
+    this.ctx.stroke();
   }
 
   updateDx() {

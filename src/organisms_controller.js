@@ -4,8 +4,10 @@ import { distance, distanceY, positiveMod,
          gravitation } from '../util/util';
 
 export default class OrganismsController {
-  constructor() {
+  constructor(reproductionPeriod) {
     this.organisms = [];
+    this.lastReproduced = Date.now();
+    this.reproductionPeriod = reproductionPeriod;
   }
 
   moveOrganisms(panoramaSize, field) {

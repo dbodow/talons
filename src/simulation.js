@@ -4,8 +4,9 @@ import Panorama from './panorama';
 import Zoo from './zoo';
 
 export default class Simulation {
-  constructor(canvas, simulationParams) {
+  constructor(canvas, graph, simulationParams) {
     this.canvas = canvas;
+    this.graph = graph;
     this.simulationParams = simulationParams;
     this.panorama = new Panorama(this.canvas);
     this.zoo = new Zoo(this.simulationParams.predatorsParams(),
@@ -20,6 +21,7 @@ export default class Simulation {
       this.panorama.updateDx();
       this.zoo.tick();
       this.panorama.draw(this.zoo);
+      this.graph.draw(this.zoo);
     }, 42); //42 mHz = 24 fps
   }
 }

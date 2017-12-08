@@ -5,9 +5,10 @@ import OrganismsController from './organisms_controller';
 import { fieldCellCoords } from '../util/util';
 
 export default class PredatorsController extends OrganismsController {
-  constructor(predatorsParams, panoramaSize) {
-    super();
-    this.populatePredators(predatorsParams, panoramaSize);
+  constructor({predatorParams, count, reproductionPeriod}, panoramaSize) {
+    super(reproductionPeriod);
+    this.predatorParams = predatorParams;
+    this.populatePredators({predatorParams, count}, panoramaSize);
   }
 
   populatePredators({count, predatorParams}, panoramaSize) {
@@ -35,14 +36,25 @@ export default class PredatorsController extends OrganismsController {
     return Array.from(new Set(eaten));
   }
 
-  // starvePredators() {
-  //   const starved = [];
-  //   const currentTime = Date.now();
-  //   this.organisms.forEach( predator => {
-  //     if (currentTime - predator.lastAte > predator.efficiency) {
-  //       starved.push(predator);
-  //     }
-  //   });
-  //   this.killOrganisms(starved);
-  // }
+  starvePredators() {
+    const starved = [];
+    const currentTime = Date.now();
+    this.organisms.forEach( predator => {
+      if (currentTime - predator.lastAte > predator.efficiency) {
+        starved.push(predator);
+      }
+    });
+    this.killOrganisms(starved);
+  }
+
+  reproducePredators(panoramaSize) {
+    if (Date.now() - this.lastReproduced > this.reproductionPeriod) {
+      const populateParams = {
+        count: this.organisms.length,
+        predatorParams: this.predatorParams
+      };
+      this.populatePredators(populateParams, panoramaSize);
+      this.lastReproduced = Date.now();
+    }
+  }
 }

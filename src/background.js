@@ -1,6 +1,7 @@
 'use strict';
 
-const backgroundPath = 'https://s3-us-west-1.amazonaws.com/talons-dev/placeholder-background.jpeg';
+// const backgroundPath = 'https://s3-us-west-1.amazonaws.com/talons-dev/placeholder-background.jpeg';
+const backgroundPath = 'https://s3-us-west-1.amazonaws.com/talons-dev/final-background-cropped.jpeg';
 
 export default class Background {
   // eventually refactor into background and panorama classes

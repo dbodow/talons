@@ -16,8 +16,10 @@ export default class Zoo {
 
   tick() {
     this.feed();
+    this.starve();
     this.calculateFields();
     this.moveOrganisms();
+    this.reproduce();
   }
 
   moveOrganisms() {
@@ -58,5 +60,15 @@ export default class Zoo {
 
   calculatePreysLocations() {
     return this.preysController.revealLocations(this.preysField.fieldNetSize);
+  }
+
+  starve() {
+    this.predatorsController.starvePredators();
+    this.preysController.starvePreys();
+  }
+
+  reproduce() {
+    this.predatorsController.reproducePredators(this.panoramaSize);
+    this.preysController.reproducePreys(this.panoramaSize);
   }
 }
