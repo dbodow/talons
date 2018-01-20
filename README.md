@@ -1,5 +1,7 @@
 # Talons: A predator-prey dynamics simulator
 
+[Live Site](https://dbodow.github.io/talons/)
+
 ## Table of Contents
   * [Background and Overview](#background-and-overview)
   * [Setting Parameters](#setting-parameters)
