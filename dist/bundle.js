@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -139,6 +139,84 @@ const fitToAxis = (value, valueMax, axisMax) => (
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var root = __webpack_require__(11);
+
+/** Built-in value references. */
+var Symbol = root.Symbol;
+
+module.exports = Symbol;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseToString = __webpack_require__(10);
+
+/**
+ * Converts `value` to a string. An empty string is returned for `null`
+ * and `undefined` values. The sign of `-0` is preserved.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to convert.
+ * @returns {string} Returns the converted string.
+ * @example
+ *
+ * _.toString(null);
+ * // => ''
+ *
+ * _.toString(-0);
+ * // => '-0'
+ *
+ * _.toString([1, 2, 3]);
+ * // => '1,2,3'
+ */
+function toString(value) {
+  return value == null ? '' : baseToString(value);
+}
+
+module.exports = toString;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsZWJ = '\\u200d';
+
+/** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
+var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
+
+/**
+ * Checks if `string` contains Unicode symbols.
+ *
+ * @private
+ * @param {string} string The string to inspect.
+ * @returns {boolean} Returns `true` if a symbol is found, else `false`.
+ */
+function hasUnicode(string) {
+  return reHasUnicode.test(string);
+}
+
+module.exports = hasUnicode;
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -224,7 +302,7 @@ class Organism {
 
 
 /***/ }),
-/* 2 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -265,56 +343,45 @@ class OrganismsController {
 
 
 /***/ }),
-/* 3 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__simulation_params__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__simulation__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__sliders__ = __webpack_require__(15);
-
-
-
-
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__simulation_params__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__sliders__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__simulation__ = __webpack_require__(28);
 
 // This file manages interaction with the HTML document
+// and integrates the top-level systems of the simulation.
+
+// `SimulationParams` acts as a single source of truth for all parameters
+
+// `Sliders` controls the slider components on the webpage, allowing
+// users to change the simulation parameters as desired. Data flows from
+// `Sliders` to `SimulationParams`
+
+// `Simulation` runs the ecosystem model: it tracks the 'animals' and their
+// interactions, and measures population levels
+
+
+
+
+
 
 document.addEventListener("DOMContentLoaded", function(event) {
   const canvas = document.getElementById("canvas");
   const graph = document.getElementById("graph");
-  const sliderEls = {
-    predatorsSliders: {
-      count: document.getElementById("predator-count"),
-      speed: document.getElementById("predator-speed"),
-      perception: document.getElementById("predator-perception"),
-      efficiency: document.getElementById("predator-efficiency"),
-      reproduction: document.getElementById("predator-reproduction")
-    },
-    preysSliders: {
-      count: document.getElementById("prey-count"),
-      speed: document.getElementById("prey-speed"),
-      camoflage: document.getElementById("prey-camoflage"),
-      capacity: document.getElementById("prey-capacity"),
-      reproduction: document.getElementById("prey-reproduction")
-    },
-    controls: {
-      play: document.getElementById("play-button"),
-      pause: document.getElementById("pause-button"),
-      restart: document.getElementById("restart-button")
-    }
-  };
   const simulationParams = new __WEBPACK_IMPORTED_MODULE_0__simulation_params__["a" /* default */];
-  const simulation = new __WEBPACK_IMPORTED_MODULE_1__simulation__["a" /* default */](canvas, graph, simulationParams);
-  const sliders = new __WEBPACK_IMPORTED_MODULE_2__sliders__["a" /* default */](sliderEls, simulation, simulationParams);
+  const simulation = new __WEBPACK_IMPORTED_MODULE_2__simulation__["a" /* default */](canvas, graph, simulationParams);
+  const sliders = new __WEBPACK_IMPORTED_MODULE_1__sliders__["a" /* default */](simulation, simulationParams);
   // simulation.loadAssets(); // fetch images from server for user in canvas
   simulation.begin();
 });
 
 
 /***/ }),
-/* 4 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -393,13 +460,745 @@ class SimulationParams {
 
 
 /***/ }),
-/* 5 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__panorama__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__zoo__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_capitalize__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_capitalize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash_capitalize__);
+
+
+
+// This file manages listeners for the parameter sliders on the webpage
+// It updates the SimulationParams when a user makes changes
+
+// Select all the sliders through DOM
+const sliderEls = {
+  predatorsSliders: {
+    count: document.getElementById("predator-count"),
+    speed: document.getElementById("predator-speed"),
+    perception: document.getElementById("predator-perception"),
+    efficiency: document.getElementById("predator-efficiency"),
+    reproduction: document.getElementById("predator-reproduction")
+  },
+  preysSliders: {
+    count: document.getElementById("prey-count"),
+    speed: document.getElementById("prey-speed"),
+    camoflage: document.getElementById("prey-camoflage"),
+    capacity: document.getElementById("prey-capacity"),
+    reproduction: document.getElementById("prey-reproduction")
+  },
+  controls: {
+    play: document.getElementById("play-button"),
+    pause: document.getElementById("pause-button"),
+    restart: document.getElementById("restart-button")
+  }
+};
+
+// This class manages event listeners for controlling the simulation and
+// changing its parameters
+class Sliders {
+  constructor(simulation, simulationParams) {
+    this.simulation = simulation;
+    this.simulationParams = simulationParams;
+    this.initializeEventListeners(sliderEls);
+    this.isPlaying = true;
+  }
+
+  initializeEventListeners({predatorsSliders, preysSliders, controls}) {
+    this.initializePredatorsEventListeners(predatorsSliders);
+    this.initializePreysEventListeners(preysSliders);
+    this.initializeControlsEventListeners(controls);
+  }
+
+  initializeControl(controlGroup, controlName, eventName, callback) {
+    console.log(controlGroup, controlGroup[controlName]);
+    controlGroup[controlName].addEventListener(eventName, callback);
+  }
+
+  initializePredatorsEventListeners(predatorsSliders) {
+    Object.keys(predatorsSliders).forEach(controlName => {
+      this.initializeControl(predatorsSliders, controlName, 'mouseup', e => {
+        // custom logic for transforming the user input to a parameter
+        if (controlName === "perception") {
+          // lower perception values are better
+          // (they are an inverse-distance weight)
+          this.simulationParams['predator' + __WEBPACK_IMPORTED_MODULE_0_lodash_capitalize___default()(controlName)] =
+            25 - e.target.value;
+        } else {
+          // in most cases, the slider's value is the exact parameter value
+          this.simulationParams['predator' + __WEBPACK_IMPORTED_MODULE_0_lodash_capitalize___default()(controlName)] =
+            e.target.value;
+        }
+        // propogate updated parameters to the models
+        this.updateOrganisms();
+      });
+    });
+  }
+
+  initializePreysEventListeners(preysSliders) {
+    preysSliders.count.addEventListener('mouseup', e => {
+      this.simulationParams.preyCount = e.target.value;
+    });
+    preysSliders.speed.addEventListener('mouseup', e => {
+      this.simulationParams.preySpeed = e.target.value;
+      this.updateOrganisms();
+    });
+    preysSliders.camoflage.addEventListener('mouseup', e => {
+      this.simulationParams.preyCamoflage = e.target.value / 100;
+      this.updatePreysField();
+    });
+    preysSliders.capacity.addEventListener('mouseup', e => {
+      this.simulationParams.preyCarryingCapacity = e.target.value;
+      this.updateOrganisms();
+    });
+    preysSliders.reproduction.addEventListener('mouseup', e => {
+      this.simulationParams.preyReproductionPeriod = e.target.value;
+      this.updateOrganisms();
+    });
+  }
+
+  initializeControlsEventListeners(controls) {
+    controls.play.addEventListener('click', e => {
+      this.togglePlaying('play');
+    });
+    controls.pause.addEventListener('click', e => {
+      this.togglePlaying('pause');
+    });
+    controls.restart.addEventListener('click', e => {
+      this.togglePlaying('restart');
+    });
+  }
+
+  updateOrganisms() {
+    // need to transform inputs from the linear slider values
+    // this.simulationParams.predatorPerception =
+    //   25 - this.simulationParams.predatorPerception;
+    this.simulation.updateOrganisms({
+      predatorsParams: this.simulationParams.predatorsParams(),
+      preysParams: this.simulationParams.preysParams()
+    });
+  }
+
+  updatePreysField() {
+    this.simulation.updatePreysField(this.simulationParams.preyFieldParams());
+  }
+
+  togglePlaying(type) {
+    switch (type) {
+      case 'play':
+        if (!this.isPlaying) {
+          this.isPlaying = true;
+          this.simulation.togglePlaying(true);
+        }
+        break;
+      case 'pause':
+        this.isPlaying = false;
+        this.simulation.togglePlaying(false);
+        break;
+      case 'restart':
+        this.isPlaying = true;
+        this.simulation.restart();
+        break;
+    }
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Sliders;
+
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var toString = __webpack_require__(2),
+    upperFirst = __webpack_require__(21);
+
+/**
+ * Converts the first character of `string` to upper case and the remaining
+ * to lower case.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to capitalize.
+ * @returns {string} Returns the capitalized string.
+ * @example
+ *
+ * _.capitalize('FRED');
+ * // => 'Fred'
+ */
+function capitalize(string) {
+  return upperFirst(toString(string).toLowerCase());
+}
+
+module.exports = capitalize;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Symbol = __webpack_require__(1),
+    arrayMap = __webpack_require__(14),
+    isArray = __webpack_require__(15),
+    isSymbol = __webpack_require__(16);
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0;
+
+/** Used to convert symbols to primitives and strings. */
+var symbolProto = Symbol ? Symbol.prototype : undefined,
+    symbolToString = symbolProto ? symbolProto.toString : undefined;
+
+/**
+ * The base implementation of `_.toString` which doesn't convert nullish
+ * values to empty strings.
+ *
+ * @private
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ */
+function baseToString(value) {
+  // Exit early for strings to avoid a performance hit in some environments.
+  if (typeof value == 'string') {
+    return value;
+  }
+  if (isArray(value)) {
+    // Recursively convert values (susceptible to call stack limits).
+    return arrayMap(value, baseToString) + '';
+  }
+  if (isSymbol(value)) {
+    return symbolToString ? symbolToString.call(value) : '';
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+module.exports = baseToString;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var freeGlobal = __webpack_require__(12);
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+module.exports = root;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+module.exports = freeGlobal;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports) {
+
+/**
+ * A specialized version of `_.map` for arrays without support for iteratee
+ * shorthands.
+ *
+ * @private
+ * @param {Array} [array] The array to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Array} Returns the new mapped array.
+ */
+function arrayMap(array, iteratee) {
+  var index = -1,
+      length = array == null ? 0 : array.length,
+      result = Array(length);
+
+  while (++index < length) {
+    result[index] = iteratee(array[index], index, array);
+  }
+  return result;
+}
+
+module.exports = arrayMap;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports) {
+
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
+module.exports = isArray;
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseGetTag = __webpack_require__(17),
+    isObjectLike = __webpack_require__(20);
+
+/** `Object#toString` result references. */
+var symbolTag = '[object Symbol]';
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike(value) && baseGetTag(value) == symbolTag);
+}
+
+module.exports = isSymbol;
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Symbol = __webpack_require__(1),
+    getRawTag = __webpack_require__(18),
+    objectToString = __webpack_require__(19);
+
+/** `Object#toString` result references. */
+var nullTag = '[object Null]',
+    undefinedTag = '[object Undefined]';
+
+/** Built-in value references. */
+var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+/**
+ * The base implementation of `getTag` without fallbacks for buggy environments.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+function baseGetTag(value) {
+  if (value == null) {
+    return value === undefined ? undefinedTag : nullTag;
+  }
+  return (symToStringTag && symToStringTag in Object(value))
+    ? getRawTag(value)
+    : objectToString(value);
+}
+
+module.exports = baseGetTag;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Symbol = __webpack_require__(1);
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var nativeObjectToString = objectProto.toString;
+
+/** Built-in value references. */
+var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+/**
+ * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the raw `toStringTag`.
+ */
+function getRawTag(value) {
+  var isOwn = hasOwnProperty.call(value, symToStringTag),
+      tag = value[symToStringTag];
+
+  try {
+    value[symToStringTag] = undefined;
+    var unmasked = true;
+  } catch (e) {}
+
+  var result = nativeObjectToString.call(value);
+  if (unmasked) {
+    if (isOwn) {
+      value[symToStringTag] = tag;
+    } else {
+      delete value[symToStringTag];
+    }
+  }
+  return result;
+}
+
+module.exports = getRawTag;
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var nativeObjectToString = objectProto.toString;
+
+/**
+ * Converts `value` to a string using `Object.prototype.toString`.
+ *
+ * @private
+ * @param {*} value The value to convert.
+ * @returns {string} Returns the converted string.
+ */
+function objectToString(value) {
+  return nativeObjectToString.call(value);
+}
+
+module.exports = objectToString;
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports) {
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return value != null && typeof value == 'object';
+}
+
+module.exports = isObjectLike;
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var createCaseFirst = __webpack_require__(22);
+
+/**
+ * Converts the first character of `string` to upper case.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category String
+ * @param {string} [string=''] The string to convert.
+ * @returns {string} Returns the converted string.
+ * @example
+ *
+ * _.upperFirst('fred');
+ * // => 'Fred'
+ *
+ * _.upperFirst('FRED');
+ * // => 'FRED'
+ */
+var upperFirst = createCaseFirst('toUpperCase');
+
+module.exports = upperFirst;
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var castSlice = __webpack_require__(23),
+    hasUnicode = __webpack_require__(3),
+    stringToArray = __webpack_require__(25),
+    toString = __webpack_require__(2);
+
+/**
+ * Creates a function like `_.lowerFirst`.
+ *
+ * @private
+ * @param {string} methodName The name of the `String` case method to use.
+ * @returns {Function} Returns the new case function.
+ */
+function createCaseFirst(methodName) {
+  return function(string) {
+    string = toString(string);
+
+    var strSymbols = hasUnicode(string)
+      ? stringToArray(string)
+      : undefined;
+
+    var chr = strSymbols
+      ? strSymbols[0]
+      : string.charAt(0);
+
+    var trailing = strSymbols
+      ? castSlice(strSymbols, 1).join('')
+      : string.slice(1);
+
+    return chr[methodName]() + trailing;
+  };
+}
+
+module.exports = createCaseFirst;
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseSlice = __webpack_require__(24);
+
+/**
+ * Casts `array` to a slice if it's needed.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {number} start The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the cast slice.
+ */
+function castSlice(array, start, end) {
+  var length = array.length;
+  end = end === undefined ? length : end;
+  return (!start && end >= length) ? array : baseSlice(array, start, end);
+}
+
+module.exports = castSlice;
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+/**
+ * The base implementation of `_.slice` without an iteratee call guard.
+ *
+ * @private
+ * @param {Array} array The array to slice.
+ * @param {number} [start=0] The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the slice of `array`.
+ */
+function baseSlice(array, start, end) {
+  var index = -1,
+      length = array.length;
+
+  if (start < 0) {
+    start = -start > length ? 0 : (length + start);
+  }
+  end = end > length ? length : end;
+  if (end < 0) {
+    end += length;
+  }
+  length = start > end ? 0 : ((end - start) >>> 0);
+  start >>>= 0;
+
+  var result = Array(length);
+  while (++index < length) {
+    result[index] = array[index + start];
+  }
+  return result;
+}
+
+module.exports = baseSlice;
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var asciiToArray = __webpack_require__(26),
+    hasUnicode = __webpack_require__(3),
+    unicodeToArray = __webpack_require__(27);
+
+/**
+ * Converts `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function stringToArray(string) {
+  return hasUnicode(string)
+    ? unicodeToArray(string)
+    : asciiToArray(string);
+}
+
+module.exports = stringToArray;
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports) {
+
+/**
+ * Converts an ASCII `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function asciiToArray(string) {
+  return string.split('');
+}
+
+module.exports = asciiToArray;
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
+
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsAstral = '[' + rsAstralRange + ']',
+    rsCombo = '[' + rsComboRange + ']',
+    rsFitz = '\\ud83c[\\udffb-\\udfff]',
+    rsModifier = '(?:' + rsCombo + '|' + rsFitz + ')',
+    rsNonAstral = '[^' + rsAstralRange + ']',
+    rsRegional = '(?:\\ud83c[\\udde6-\\uddff]){2}',
+    rsSurrPair = '[\\ud800-\\udbff][\\udc00-\\udfff]',
+    rsZWJ = '\\u200d';
+
+/** Used to compose unicode regexes. */
+var reOptMod = rsModifier + '?',
+    rsOptVar = '[' + rsVarRange + ']?',
+    rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
+    rsSeq = rsOptVar + reOptMod + rsOptJoin,
+    rsSymbol = '(?:' + [rsNonAstral + rsCombo + '?', rsCombo, rsRegional, rsSurrPair, rsAstral].join('|') + ')';
+
+/** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
+var reUnicode = RegExp(rsFitz + '(?=' + rsFitz + ')|' + rsSymbol + rsSeq, 'g');
+
+/**
+ * Converts a Unicode `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function unicodeToArray(string) {
+  return string.match(reUnicode) || [];
+}
+
+module.exports = unicodeToArray;
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__panorama__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__zoo__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(37);
 
 
 
@@ -463,11 +1262,11 @@ class Simulation {
 
 
 /***/ }),
-/* 6 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__background__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__background__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_util__ = __webpack_require__(0);
 
 
@@ -566,7 +1365,7 @@ class Panorama {
 
 
 /***/ }),
-/* 7 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -610,13 +1409,13 @@ class Background {
 
 
 /***/ }),
-/* 8 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__predators_controller__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__preys_controller__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__field__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__predators_controller__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__preys_controller__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__field__ = __webpack_require__(36);
 
 
 
@@ -705,12 +1504,12 @@ class Zoo {
 
 
 /***/ }),
-/* 9 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__predator__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__predator__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_util__ = __webpack_require__(0);
 
 
@@ -785,11 +1584,11 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
 
 
 /***/ }),
-/* 10 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__organism__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__organism__ = __webpack_require__(4);
 
 
 
@@ -816,12 +1615,12 @@ class Predator extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */
 
 
 /***/ }),
-/* 11 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__prey__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__prey__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__organisms_controller__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_util__ = __webpack_require__(0);
 
 
@@ -881,7 +1680,6 @@ class PreysController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller_
     this.preyParams = preyParams;
     this.reproductionPeriod = reproductionPeriod;
     this.carryingCapacity = carryingCapacity;
-    console.log(this.reproductionPeriod);
     this.organisms.forEach( prey => {
       prey.updatePreyParams(preyParams);
     });
@@ -892,11 +1690,11 @@ class PreysController extends __WEBPACK_IMPORTED_MODULE_1__organisms_controller_
 
 
 /***/ }),
-/* 12 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__organism__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__organism__ = __webpack_require__(4);
 
 
 
@@ -915,7 +1713,7 @@ class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
 
 
 /***/ }),
-/* 13 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1022,7 +1820,7 @@ class Field {
 
 
 /***/ }),
-/* 14 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1133,117 +1931,6 @@ class Graph {
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
-
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-
-class Sliders {
-  constructor(sliderEls, simulation, simulationParams) {
-    this.simulation = simulation;
-    this.simulationParams = simulationParams;
-    this.initializeEventListeners(sliderEls);
-    this.isPlaying = true;
-  }
-
-  initializeEventListeners({predatorsSliders, preysSliders, controls}) {
-    this.initializePredatorsEventListeners(predatorsSliders);
-    this.initializePreysEventListeners(preysSliders);
-    this.initializeControlsEventListeners(controls);
-  }
-
-  initializePredatorsEventListeners(predatorsSliders) {
-    predatorsSliders.count.addEventListener('mouseup', e => {
-      this.simulationParams.predatorCount = e.target.value;
-    });
-    predatorsSliders.speed.addEventListener('mouseup', e => {
-      this.simulationParams.predatorSpeed = e.target.value;
-      this.updateOrganisms();
-    });
-    predatorsSliders.perception.addEventListener('mouseup', e => {
-      this.simulationParams.predatorPerception = 25 - e.target.value;
-      this.updateOrganisms();
-    });
-    predatorsSliders.efficiency.addEventListener('mouseup', e => {
-      this.simulationParams.predatorEfficiency = e.target.value;
-      this.updateOrganisms();
-    });
-    predatorsSliders.reproduction.addEventListener('mouseup', e => {
-      this.simulationParams.predatorReproductionPeriod = e.target.value;
-      this.updateOrganisms();
-    });
-  }
-
-  initializePreysEventListeners(preysSliders) {
-    preysSliders.count.addEventListener('mouseup', e => {
-      this.simulationParams.preyCount = e.target.value;
-    });
-    preysSliders.speed.addEventListener('mouseup', e => {
-      this.simulationParams.preySpeed = e.target.value;
-      this.updateOrganisms();
-    });
-    preysSliders.camoflage.addEventListener('mouseup', e => {
-      this.simulationParams.preyCamoflage = e.target.value / 100;
-      this.updatePreysField();
-    });
-    preysSliders.capacity.addEventListener('mouseup', e => {
-      this.simulationParams.preyCarryingCapacity = e.target.value;
-      this.updateOrganisms();
-    });
-    preysSliders.reproduction.addEventListener('mouseup', e => {
-      this.simulationParams.preyReproductionPeriod = e.target.value;
-      this.updateOrganisms();
-    });
-  }
-
-  initializeControlsEventListeners(controls) {
-    controls.play.addEventListener('click', e => {
-      this.togglePlaying('play');
-    });
-    controls.pause.addEventListener('click', e => {
-      this.togglePlaying('pause');
-    });
-    controls.restart.addEventListener('click', e => {
-      this.togglePlaying('restart');
-    });
-  }
-
-  updateOrganisms() {
-    this.simulation.updateOrganisms({
-      predatorsParams: this.simulationParams.predatorsParams(),
-      preysParams: this.simulationParams.preysParams()
-    });
-  }
-
-  updatePreysField() {
-    this.simulation.updatePreysField(this.simulationParams.preyFieldParams());
-  }
-
-  togglePlaying(type) {
-    switch (type) {
-      case 'play':
-        if (!this.isPlaying) {
-          this.isPlaying = true;
-          this.simulation.togglePlaying(true);
-        }
-        break;
-      case 'pause':
-        this.isPlaying = false;
-        this.simulation.togglePlaying(false);
-        break;
-      case 'restart':
-        this.isPlaying = true;
-        this.simulation.restart();
-        break;
-    }
-  }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Sliders;
 
 
 
