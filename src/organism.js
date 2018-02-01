@@ -13,6 +13,7 @@ export default class Organism {
     this.initializeDirection();
   }
 
+  // Choose a random spot on the display for the organism to be placed
   initializeCenter({width, height}) {
     this.center = {
       x: Math.random() * width,
@@ -20,6 +21,7 @@ export default class Organism {
     };
   }
 
+  // Choose a random direction for the organism to move at its initialization
   initializeDirection() {
     // sample as an angle for a uniform radial distribution
     // i.e. don't bias directions to the diagonals via a cartesian ransom sample
@@ -30,6 +32,7 @@ export default class Organism {
     };
   }
 
+  // move the organism's position by one tick
   moveOrganism({width, height}) {
     this.center = {
       x: positiveMod(this.center.x + this.dxdt(), width),
@@ -38,22 +41,28 @@ export default class Organism {
     this.resolveBounces(height);
   }
 
+  // y-velocity
   dydt() {
     return this.speed * this.direction.y;
   }
 
+  // x-velocity
   dxdt() {
     return this.speed * this.direction.x;
   }
 
+  // minimum y-position the organism can fit on the display
   minHeight() {
     return this.radius;
   }
 
+  // maximum y-position the organism can fit on the display
   maxHeight(height) {
     return height - this.radius;
   }
 
+  // prevent rendering outside of the display and
+  // flip y-velocity to "bounce" off of the display's edge
   resolveBounces(height) {
     if (this.center.y > this.maxHeight(height)) {
       const overflow = this.center.y - this.maxHeight(height);
@@ -66,6 +75,8 @@ export default class Organism {
     }
   }
 
+  // change the direction the organism is moving based on
+  // the predator/prey interactions.
   updateDirection(field) {
     const gradient = field.constructGradient(this);
     const totalSpeed = Math.sqrt( Math.pow(this.direction.x + (gradient.x / this.perception), 2) +
