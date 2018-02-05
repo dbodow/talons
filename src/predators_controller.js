@@ -65,4 +65,9 @@ export default class PredatorsController extends OrganismsController {
       predator.updatePredatorParams(predatorParams);
     });
   }
+
+  unpause(pauseTimestamp) {
+    const elapsedTime = Date.now() - pauseTimestamp;
+    this.organisms.forEach(organism => organism.unpause(elapsedTime));
+  }
 }

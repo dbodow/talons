@@ -235,6 +235,7 @@ class Organism {
     this.initializeDirection();
   }
 
+  // Choose a random spot on the display for the organism to be placed
   initializeCenter({width, height}) {
     this.center = {
       x: Math.random() * width,
@@ -242,6 +243,7 @@ class Organism {
     };
   }
 
+  // Choose a random direction for the organism to move at its initialization
   initializeDirection() {
     // sample as an angle for a uniform radial distribution
     // i.e. don't bias directions to the diagonals via a cartesian ransom sample
@@ -252,6 +254,7 @@ class Organism {
     };
   }
 
+  // move the organism's position by one tick
   moveOrganism({width, height}) {
     this.center = {
       x: Object(__WEBPACK_IMPORTED_MODULE_0__util_util__["h" /* positiveMod */])(this.center.x + this.dxdt(), width),
@@ -260,22 +263,28 @@ class Organism {
     this.resolveBounces(height);
   }
 
+  // y-velocity
   dydt() {
     return this.speed * this.direction.y;
   }
 
+  // x-velocity
   dxdt() {
     return this.speed * this.direction.x;
   }
 
+  // minimum y-position the organism can fit on the display
   minHeight() {
     return this.radius;
   }
 
+  // maximum y-position the organism can fit on the display
   maxHeight(height) {
     return height - this.radius;
   }
 
+  // prevent rendering outside of the display and
+  // flip y-velocity to "bounce" off of the display's edge
   resolveBounces(height) {
     if (this.center.y > this.maxHeight(height)) {
       const overflow = this.center.y - this.maxHeight(height);
@@ -288,6 +297,8 @@ class Organism {
     }
   }
 
+  // change the direction the organism is moving based on
+  // the predator/prey interactions.
   updateDirection(field) {
     const gradient = field.constructGradient(this);
     const totalSpeed = Math.sqrt( Math.pow(this.direction.x + (gradient.x / this.perception), 2) +
@@ -306,7 +317,9 @@ class Organism {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_util__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_capitalize__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_capitalize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash_capitalize__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_util__ = __webpack_require__(0);
 
 
 
@@ -368,15 +381,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+const handleVisibilityChange = (simulation) => {
+  if (document.hidden) {
+    simulation.togglePlaying(false);
+  } else {
+    simulation.togglePlaying(true);
+  }
+};
 
 document.addEventListener("DOMContentLoaded", function(event) {
   const canvas = document.getElementById("canvas");
   const graph = document.getElementById("graph");
+
   const simulationParams = new __WEBPACK_IMPORTED_MODULE_0__simulation_params__["a" /* default */];
   const simulation = new __WEBPACK_IMPORTED_MODULE_2__simulation__["a" /* default */](canvas, graph, simulationParams);
   const sliders = new __WEBPACK_IMPORTED_MODULE_1__sliders__["a" /* default */](simulation, simulationParams);
-  // simulation.loadAssets(); // fetch images from server for user in canvas
+
   simulation.begin();
+
+  document.addEventListener(
+    "visibilitychange",
+    () => handleVisibilityChange(simulation)
+  );
 });
 
 
@@ -393,26 +419,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
 class SimulationParams {
   constructor() {
     //set defaults
-    this.predatorCount = 20;
-    this.predatorSpeed = 15;
-    this.predatorRadius = 40;
-    this.predatorGravitationNbhd = 10;
+    this.predatorCount = 20; // count at initialization or reset
+    this.predatorSpeed = 15; // pixels moved per tick
+    this.predatorRadius = 40; // radius of the graphical circle
+    this.predatorGravitationNbhd = 10; // px size of neighborhood to detect prey
     this.predatorColor = '#354b6d';
-    this.predatorEfficiency = 10000;
+    this.predatorEfficiency = 10000; // milliseconds a predator can survive without feeding
     this.predatorPerception = 25; // lower is better; this is a 1/x weight
-    this.predatorReproductionPeriod = 12000; // should be longer than efficiency
-    this.preyCount = 50;
-    this.preySpeed = 10;
-    this.preyRadius = 10;
-    this.preyGravitationNbhd = 20;
+    this.predatorReproductionPeriod = 12000; // ms; should be longer than predator efficiency to avoid explosion
+    this.preyCount = 50; // count at initialization or reset
+    this.preySpeed = 10; // pixels moved per tick
+    this.preyRadius = 10; // radius of the graphical circle
+    this.preyGravitationNbhd = 20; // px size of neighborhood to detect predators
     this.preyColor = '#efe092';
     this.preyPerception = 7; // lower is better; this is a 1/x weight
-    this.preyCamoflage = 0.5;
-    this.preyReproductionPeriod = 10000; // should be longer than efficiency
-    this.preyCarryingCapacity = 200;
-    this.fieldNetSize = 10; // Must be smaller than radius/sqrt(2)!
+    this.preyCamoflage = 0.5; // weight on the 'gravitational field' for each prey; lower is less detectable
+    this.preyReproductionPeriod = 10000; // ms
+    this.preyCarryingCapacity = 200; // maximum number of prey
+    this.fieldNetSize = 10; // grid size of the gravitational field; Must be smaller than both radii/sqrt(2)!
   }
 
+  // normalize params for Predators / PredatorsController
   predatorsParams() {
     return {
       count: this.predatorCount,
@@ -427,6 +454,7 @@ class SimulationParams {
     };
   }
 
+  // normalize params for Preys / PreysController
   preysParams() {
     return {
       count: this.preyCount,
@@ -441,6 +469,7 @@ class SimulationParams {
     };
   }
 
+  // normalize params for PredatorsField
   predatorFieldParams() {
     return {
       fieldNetSize: this.fieldNetSize,
@@ -448,6 +477,7 @@ class SimulationParams {
     };
   }
 
+  // normalize params for PreysField
   preyFieldParams() {
     return {
       fieldNetSize: this.fieldNetSize,
@@ -1217,22 +1247,39 @@ class Simulation {
                        this.simulationParams.predatorFieldParams(),
                        this.simulationParams.preyFieldParams(),
                        this.panorama.panoramaSize);
+    this.animationInterval = 1000 / 24; // i.e. 24 fps throttle
   }
 
-  begin() {
-    this.ticker = setInterval(() => {
+  tick(timestamp) {
+    this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+
+    const now = Date.now();
+    const elapsed = now - this.nextRender;
+
+    if (elapsed > this.animationInterval) {
+      this.nextRender = now;
+
       this.panorama.updateDx();
       this.zoo.tick();
       this.panorama.draw(this.zoo);
       this.graph.draw(this.zoo);
-    }, 42); //42 mHz = 24 fps
+    }
+  }
+
+  begin() {
+    this.nextRender = Date.now();
+    this.tick();
   }
 
   togglePlaying(bool) {
     if (bool) {
+      this.pauseTimestamp = this.pauseTimestamp || Date.now();
+      this.zoo.unpause(this.pauseTimestamp);
+      delete this.pauseTimestamp;
       this.begin();
     } else {
-      clearInterval(this.ticker);
+      this.pauseTimestamp = Date.now();
+      window.cancelAnimationFrame(this.ticker);
     }
   }
 
@@ -1246,7 +1293,7 @@ class Simulation {
   }
 
   restart() {
-    clearInterval(this.ticker);
+    window.cancelAnimationFrame(this.ticker);
     this.graph = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */](this.graphCanvas, this.simulationParams);
     this.panorama = new __WEBPACK_IMPORTED_MODULE_0__panorama__["a" /* default */](this.canvas);
     this.zoo = new __WEBPACK_IMPORTED_MODULE_1__zoo__["a" /* default */](this.simulationParams.predatorsParams(),
@@ -1495,8 +1542,17 @@ class Zoo {
   }
 
   reproduce() {
-    this.predatorsController.reproducePredators(this.panoramaSize);
-    this.preysController.reproducePreys(this.panoramaSize);
+    if (!this.unpauseTimestamp) {
+      this.predatorsController.reproducePredators(this.panoramaSize);
+      this.preysController.reproducePreys(this.panoramaSize);
+    } else if (Date.now() > this.unpauseTimestamp) {
+      delete this.unpauseTimestamp;
+    }
+  }
+
+  unpause(pauseTimestamp) {
+    this.unpauseTimestamp = 2 * Date.now() - pauseTimestamp;
+    this.predatorsController.unpause(pauseTimestamp);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Zoo;
@@ -1578,6 +1634,11 @@ class PredatorsController extends __WEBPACK_IMPORTED_MODULE_1__organisms_control
       predator.updatePredatorParams(predatorParams);
     });
   }
+
+  unpause(pauseTimestamp) {
+    const elapsedTime = Date.now() - pauseTimestamp;
+    this.organisms.forEach(organism => organism.unpause(elapsedTime));
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PredatorsController;
 
@@ -1600,14 +1661,21 @@ class Predator extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */
     this.efficiency = predatorParams.efficiency;
   }
 
+  // allow for parameters to be changed after the initialization
+  // (e.g. based on user input on the slider)
   updatePredatorParams({speed, efficiency, perception}) {
     this.speed = speed;
     this.efficiency = efficiency;
-    this.perception = perception; 
+    this.perception = perception;
   }
 
+  // resets the countdown to starvation
   feed(preys) {
     this.lastAte = Date.now();
+  }
+
+  unpause(elapsedTime) {
+    this.lastAte += elapsedTime;
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Predator;
@@ -1704,6 +1772,8 @@ class Prey extends __WEBPACK_IMPORTED_MODULE_0__organism__["a" /* default */] {
     super(preyParams, panoramaSize);
   }
 
+  // allow for parameters to be changed after the initialization
+  // (e.g. based on user input on the slider)
   updatePreyParams({speed}) {
     this.speed = speed;
   }

@@ -16,22 +16,39 @@ export default class Simulation {
                        this.simulationParams.predatorFieldParams(),
                        this.simulationParams.preyFieldParams(),
                        this.panorama.panoramaSize);
+    this.animationInterval = 1000 / 24; // i.e. 24 fps throttle
   }
 
-  begin() {
-    this.ticker = setInterval(() => {
+  tick(timestamp) {
+    this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+
+    const now = Date.now();
+    const elapsed = now - this.nextRender;
+
+    if (elapsed > this.animationInterval) {
+      this.nextRender = now;
+
       this.panorama.updateDx();
       this.zoo.tick();
       this.panorama.draw(this.zoo);
       this.graph.draw(this.zoo);
-    }, 42); //42 mHz = 24 fps
+    }
+  }
+
+  begin() {
+    this.nextRender = Date.now();
+    this.tick();
   }
 
   togglePlaying(bool) {
     if (bool) {
+      this.pauseTimestamp = this.pauseTimestamp || Date.now();
+      this.zoo.unpause(this.pauseTimestamp);
+      delete this.pauseTimestamp;
       this.begin();
     } else {
-      clearInterval(this.ticker);
+      this.pauseTimestamp = Date.now();
+      window.cancelAnimationFrame(this.ticker);
     }
   }
 
@@ -45,7 +62,7 @@ export default class Simulation {
   }
 
   restart() {
-    clearInterval(this.ticker);
+    window.cancelAnimationFrame(this.ticker);
     this.graph = new Graph(this.graphCanvas, this.simulationParams);
     this.panorama = new Panorama(this.canvas);
     this.zoo = new Zoo(this.simulationParams.predatorsParams(),

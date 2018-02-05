@@ -1,5 +1,5 @@
 'use strict';
-
+import capitalize from 'lodash/capitalize';
 import { distance, distanceY, positiveMod,
          gravitation } from '../util/util';
 

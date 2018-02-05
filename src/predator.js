@@ -21,4 +21,8 @@ export default class Predator extends Organism {
   feed(preys) {
     this.lastAte = Date.now();
   }
+
+  unpause(elapsedTime) {
+    this.lastAte += elapsedTime;
+  }
 }

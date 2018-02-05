@@ -77,7 +77,16 @@ export default class Zoo {
   }
 
   reproduce() {
-    this.predatorsController.reproducePredators(this.panoramaSize);
-    this.preysController.reproducePreys(this.panoramaSize);
+    if (!this.unpauseTimestamp) {
+      this.predatorsController.reproducePredators(this.panoramaSize);
+      this.preysController.reproducePreys(this.panoramaSize);
+    } else if (Date.now() > this.unpauseTimestamp) {
+      delete this.unpauseTimestamp;
+    }
+  }
+
+  unpause(pauseTimestamp) {
+    this.unpauseTimestamp = 2 * Date.now() - pauseTimestamp;
+    this.predatorsController.unpause(pauseTimestamp);
   }
 }
