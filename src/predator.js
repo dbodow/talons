@@ -22,6 +22,8 @@ export default class Predator extends Organism {
     this.lastAte = Date.now();
   }
 
+  // add paused time to the lastAte timestamp before resuming
+  // simulation calculations
   unpause(elapsedTime) {
     this.lastAte += elapsedTime;
   }
